@@ -1,11 +1,14 @@
-import { Request, Response, Router } from "express";
-import { postItem } from "../controllers/item.controller";
+import { Router } from "express";
+import { deleteItem, getItem, getItems, postItem, updateItem } from "../controllers/item.controller";
 
 const router = Router();
 
 router
-    .get('/', (_req: Request, res: Response) => res.send({item: 'PONG'}))
-    .post('/', postItem);
+    .get('/', getItems)
+    .get('/:id', getItem)
+    .post('/', postItem)
+    .put('/:id', updateItem)
+    .delete("/:id", deleteItem)
 
 
 export { router };
