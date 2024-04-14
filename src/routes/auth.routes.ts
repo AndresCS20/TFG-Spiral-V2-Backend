@@ -1,11 +1,8 @@
 import { Request, Response, Router } from "express";
+import { authRegister, authLogin } from "../controllers/auth.controller";
 
 const router = Router();
-
-router
-.get('/', (_req: Request, res: Response) => {
-    res.send({item: 'AUTH'});
-});
-
+router.post("/register", authRegister);
+router.post("/login", authLogin);
 
 export { router };

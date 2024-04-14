@@ -1,16 +1,21 @@
-import mongoose from 'mongoose';
-import user from './user.model';
-import role from './role.model';
+import mongoose, { Mongoose } from 'mongoose';
 
-const db: {
-  mongoose: typeof mongoose,
-  user: any, // Reemplaza 'any' con el tipo real de 'user'
-  role: any, // Reemplaza 'any' con el tipo real de 'role'
-  ROLES: string[],
-} = {
-  mongoose,
-  user,
-  role,
+mongoose.Promise = global.Promise;
+
+import User from './user.model';
+import Role from './role.model';
+
+interface Database {
+  mongoose: Mongoose;
+  user: typeof User;
+  role: typeof Role;
+  ROLES: string[];
+}
+
+const db: Database = {
+  mongoose: mongoose,
+  user: User,
+  role: Role,
   ROLES: ["user", "admin", "moderator"],
 };
 
