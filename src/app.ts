@@ -23,6 +23,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+app.use(
+    session({
+      secret: process.env.JWT_SECRET || '35SADASDASDQEQWEQWE',
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: false }, // Ajusta esta configuración según tu entorno
+    })
+  );
+
 /**
  * Conecta a la base de datos de MongoDB.
  * @returns {Promise<void>} Una promesa que se resuelve cuando la conexión es exitosa.
@@ -47,4 +56,8 @@ app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`);
 })
 
+
+function session(arg0: { secret: string; resave: boolean; saveUninitialized: boolean; cookie: { secure: boolean; }; }): any {
+    throw new Error("Function not implemented.");
+}
   
