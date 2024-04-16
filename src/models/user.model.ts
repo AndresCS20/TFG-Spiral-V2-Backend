@@ -1,76 +1,86 @@
-import { Schema, Types, model, Model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 import { User } from "../interfaces/user.interface";
 
 const UserSchema = new Schema<User>(
   {
     username: {
-      required: true,
       type: String,
-      unique: true,
+      required: true,
+    },
+    fullname: {
+      type: String,
+    },
+    email: {
+      type: String,
+      required: true,
     },
     password: {
       type: String,
       required: true,
     },
-    email: {
+    ubication: {
       type: String,
     },
-    description: {
+    profile_picture: {
       type: String,
-      default: "Soy la descripcion",
     },
+    banner_picture: {
+      type: String,
+    },
+    link: {
+      type: String,
+    },
+    birth_date: {
+      type: Date,
+    },
+    following: {
+      type: [
+        {
+          user: {
+            type: Types.ObjectId,
+            ref: "users",
+          },
+          date: {
+            type: Date, 
+            default: Date.now
+          },
+        },
+      ],
+    },
+    followers: {
+      type: [
+        {
+          user: {
+            type: Types.ObjectId,
+            ref: "users",
+          },
+          date: {
+            type: Date, 
+            default: Date.now
+          },
+        },
+      ],
+    },
+    communities: {
+      type: [
+        {
+          community: {
+            type: Types.ObjectId,
+            ref: "communities",
+          },
+          date: {
+            type: Date, 
+            default: Date.now
+          },
+        },
+      ],
+    }
   },
   {
-    versionKey: false,
-    timestamps: true,
+    versionKey: false, // Desactiva la inclusión de la propiedad "__v"
+    timestamps: true, // Crea automáticamente las propiedades "createdAt" y "updatedAt"
   }
 );
 
 const UserModel = model("users", UserSchema);
 export default UserModel;
-// import { Schema, model } from 'mongoose';
-// import { User } from  '@interfaces/user.interface'
-// const UserSchema = new Schema<User>({
-//     username:{
-//         type: String,
-//         required: true
-//     },
-//     fullname:{
-//         type: String
-//     },
-//     email:{
-//         type: String,
-//         required: true
-//     },
-//     password:{
-//         type: String,
-//         required: true
-//     },
-//     ubication: {
-//         type: String
-//     },
-//     profile_picture: {
-//         type: String
-//     },
-//     banner_picture:{
-//         type: String
-//     },
-//     link: {
-//         type: String
-//     },
-//     roles: {
-//         type:[String]
-//     },
-//     birth_date: {
-//         type: Date
-//     },
-//     createdAt: {
-//         type: Date
-//     },
-//     updatedAt: {
-//         type: Date
-//     }
-// })
-
-// const UserModel = model('User',UserSchema);
-// export default UserModel;
