@@ -1,11 +1,14 @@
+import { createUser, deleteUser, getUser, getUsers, updateUser } from "@controllers/user.controller"
 import { Request, Response, Router } from "express";
 
 const router = Router();
 
-router.get('/', (_req: Request, res: Response) => {
-    console.log('someone pinged me');
-    res.send('PONG');
-});
+router
+    .get('/', getUsers)
+    .get('/:username', getUser)
+    // .post('/', createUser)
+    .patch('/:id', updateUser)
+    .delete("/:id", deleteUser)
 
 
 export { router };

@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 import { handleHttp } from "../utils/error.handle"
-import { insertItem } from "../services/item.services"
 
 const getItem = (_req: Request, res: Response) =>{
     try {
@@ -45,3 +44,7 @@ const deleteItem = (_req: Request, res: Response) =>{
 }
 
 export { getItem, getItems, updateItem, postItem, deleteItem };
+
+function insertItem(body: any) {
+    throw new Error("Function not implemented.")
+}

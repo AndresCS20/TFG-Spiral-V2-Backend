@@ -13,7 +13,6 @@ const registerNewUser = async ({ email, password, username }: User) => {
     password: passHash,
     username,
   });
-  //TODO 123456
   return registerNewUser;
 };
 //TODO Cambiar la busqueda por email a username
