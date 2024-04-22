@@ -7,8 +7,8 @@ const MemberSchema: Schema = new Schema({
 });
 
 const CommunitySchema: Schema = new Schema<Community>({
-  short_name: { type: String, required: true },
-  full_name: { type: String, required: true },
+  shortname: { type: String, required: true },
+  fullname: { type: String, required: true },
   description: { type: String },
   profile_picture: { type: String },
   banner_picture: { type: String },

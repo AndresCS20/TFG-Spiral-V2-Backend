@@ -22,18 +22,6 @@ const followUser = async ({ body }: Request, res: Response) => {
     }
   }
 
-// const followUser = async ({ body }: Request, res: Response) => {
-    
-//     try {
-//         const userId = body.userId;
-//         const followId = body.followId;
-//         const responseItem = await insertFollowSvc(userId, followId);
-//         res.status(201);
-//         res.send(responseItem);
-//       } catch (e) {
-//         handleHttp(res, "ERROR_POST_USER", e);
-//       }
-//   }
 
   
 const unFollowUser = async ({ body }: Request, res: Response) => {

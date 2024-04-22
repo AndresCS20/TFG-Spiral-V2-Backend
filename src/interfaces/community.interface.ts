@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 export interface Community{
     _id: string;
-    short_name: string;
-    full_name: string;
+    shortname: string;
+    fullname: string;
     description: string;
     profile_picture: string;
     banner_picture: string;
