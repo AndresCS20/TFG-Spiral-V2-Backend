@@ -1,5 +1,5 @@
 import { createCommunity, deleteCommunity, getAllCommunities, getCommunityMembers, getOneCommunity, getUserCommunities, isUserMemberOfCommunity, isUserOwnerOfCommunity, joinCommunity, leaveCommunity, updateCommunity } from "@controllers/community.controller";
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 
 const router = Router();
 
@@ -11,10 +11,10 @@ router
 .patch('/:shortname', updateCommunity) 
 .delete("/:shortname", deleteCommunity) 
 .get('/user/:username', getUserCommunities) // Obtener las comunidades de un usuario específico
-.post('/user/:username/:shortname/ismember', isUserMemberOfCommunity) // Comprobar si un usuario es miembro de una comunidad específica
-.post('/user/:shortname/isowner', isUserOwnerOfCommunity) // Comprobar si un usuario es el propietario de una comunidad específica
-.post('/user/:username/:shortname/join', joinCommunity) // Unirse a una comunidad específica
-.delete('/user/:username/:shortname/leave', leaveCommunity) // Abandonar una comunidad específica
+.post('/user/:shortname/ismember', isUserMemberOfCommunity) 
+.post('/user/:shortname/isowner', isUserOwnerOfCommunity) 
+.post('/user/:shortname/join', joinCommunity) 
+.delete('/user/:shortname/leave', leaveCommunity) 
 
 // .get("/", communityController.getAllCommunities)
 // .get("/:nombre_comunidad", communityController.getOneCommunity)

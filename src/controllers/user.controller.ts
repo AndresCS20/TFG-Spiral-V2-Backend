@@ -24,8 +24,8 @@ const getUser = async ({ params }: Request, res: Response) => {
   
   const updateUser = async ({ params, body }: Request, res: Response) => {
     try {
-      const { id } = params;
-      const response = await updateUserSvc(id, body);
+      const { username } = params;
+      const response = await updateUserSvc(username, body);
       res.send(response);
     } catch (e) {
       handleHttp(res, "ERROR_UPDATE_USER");

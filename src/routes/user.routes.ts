@@ -7,8 +7,8 @@ router
     .get('/', getUsers)
     .get('/:username', getUser)
     // .post('/', createUser)
-    .patch('/:id', updateUser)
-    .delete("/:id", deleteUser)
+    .patch('/:username', updateUser)
+    .delete("/:username", deleteUser)
 
 
 export { router };

@@ -1,4 +1,4 @@
-import { insertCommunitySvc, getCommunitiesSvc, getCommunitySvc, updateCommunitySvc, deleteCommunitySvc, removeUserFromCommunitySvc, addUserToCommunitySvc, checkUserIsOwnerSvc, getCommunityMembersSvc } from "@services/community.services";
+import { insertCommunitySvc, getCommunitiesSvc, getCommunitySvc, updateCommunitySvc, deleteCommunitySvc, removeUserFromCommunitySvc, addUserToCommunitySvc, checkUserIsOwnerSvc, getCommunityMembersSvc, checkUserIsMemberSvc } from "@services/community.services";
 import { handleHttp } from "@utils/error.handle";
 import { Request, Response } from "express";
 
@@ -50,10 +50,30 @@ const createCommunity = async (req: Request, res: Response) => {
         handleHttp(res, "ERROR_CREATE_COMMUNITY", e);
     }
 }
-const getUserCommunities = async (req: Request, res: Response) => {} //DUDA: ¿Este metodo debe estar en este controlador o en el de usuario?
-const isUserMemberOfCommunity = async (req: Request, res: Response) => {}
 
-//TODO Revisar que funciona bien este metodo | NO ESTA TERMINADO
+const isUserMemberOfCommunity = async (req: Request, res: Response) => {
+    try {
+        const { shortname } = req.params;
+        const { userId } = req.body;
+
+        const response = await checkUserIsMemberSvc(shortname, userId);
+        switch (response) {
+            case null:
+                res.status(404).send({ message: 'Comunidad no encontrada' });
+            break;
+            case false:
+                res.status(404).send({ message: 'No eres miembro de la comunidad' });
+            break;    
+        
+            default:
+                res.status(200).send({ message: 'Eres miembro de la comunidad' });
+            break;
+        }
+    } catch (e) {
+        handleHttp(res, "ERROR_MEMBER_COMMUNITY");
+    }
+}
+
 const isUserOwnerOfCommunity = async (req: Request, res: Response) => {
 
     try {
@@ -61,41 +81,75 @@ const isUserOwnerOfCommunity = async (req: Request, res: Response) => {
         const { userId } = req.body;
 
         const response = await checkUserIsOwnerSvc(shortname, userId);
-        console.log(response);
 
-        res.status(200).send({ message: 'Eres el propietario de la comunidad' });
+        switch (response) {
+            case null:
+                res.status(404).send({ message: 'Comunidad no encontrada' });
+            break;
+            case false:
+                res.status(404).send({ message: 'No eres el dueño de la comunidad' });
+            break;    
+        
+            default:
+                res.status(200).send({ message: 'Eres el propietario de la comunidad' });
+            break;
+        }
+
     } catch (e) {
         handleHttp(res, "ERROR_OWNER_COMMUNITY");
     }
 
 }
 
-//TODO Revisar que funciona bien este metodo. Comprobar a unirse con un usuario que no esta en la comunidad y volver a unirse
-const joinCommunity = async (req: Request, res: Response) => {
+const joinCommunity = async (req: Request, res: Response) => {  
     try {
         const { shortname } = req.params;
         const { userId } = req.body;
         const response = await addUserToCommunitySvc(shortname, userId);
-        if((response as any).message){
-            res.status(400).send(response);
-            return;
+
+        switch (response) {
+            case null:
+                res.status(404).send({ message: 'Comunidad no encontrada' });
+            break;
+            case false:
+                res.status(404).send({ message: 'Ya eres miembro de la comunidad' });
+            break;   
+            
+            case "ERROR_INSERT_USER_COMMUNITY":
+                res.status(404).send({ message: 'Error al insertar la comunidad en el usuario' });
+            break; 
+        
+            default:
+                res.status(200).send(response);
+            break;
         }
-        res.status(200).send(response);
+
     } catch (e) {
         handleHttp(res, "ERROR_JOIN_COMMUNITY");
     }
 }
 
-const leaveCommunity = async (req: Request, res: Response) => {
+const leaveCommunity = async (req: Request, res: Response) => { 
     try {
         const { shortname } = req.params;
         const { userId } = req.body;
         const response = await removeUserFromCommunitySvc(shortname, userId);
-        if(response.modifiedCount === 0){
-            res.status(404).send({ message: 'Comunidad no encontrada' });
-            return;
+
+        switch (response) {
+            case null:
+                res.status(404).send({ message: 'Comunidad no encontrada' });
+            break;
+            case false:
+                res.status(404).send({ message: 'No eres miembro de la comunidad' });
+            break;    
+            case "ERROR_REMOVE_USER_COMMUNITY":
+                res.status(404).send({ message: 'Error al eliminar la comunidad en el usuario' });
+            break; 
+            default:
+                res.status(200).send(response);
+            break;
         }
-        res.status(200).send(response);
+
     } catch (e) {
         handleHttp(res, "ERROR_LEAVE_COMMUNITY");
     }
@@ -116,7 +170,7 @@ const updateCommunity = async (req: Request, res: Response) => {
     }
 }
 
-const deleteCommunity = async (req: Request, res: Response) => {
+const deleteCommunity = async (req: Request, res: Response) => { //TODO: Eliminar la comunidad de la lista de comunidades del usuario
 
     try {
         const { shortname } = req.params;
@@ -133,6 +187,7 @@ const deleteCommunity = async (req: Request, res: Response) => {
 }
 
 
+const getUserCommunities = async (req: Request, res: Response) => {} //TODO DUDA: ¿Este metodo debe estar en este controlador o en el de usuario?
 
 
 export {

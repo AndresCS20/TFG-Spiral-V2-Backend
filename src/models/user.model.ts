@@ -20,6 +20,9 @@ const UserSchema = new Schema<User>(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+    },
     ubication: {
       type: String,
     },
