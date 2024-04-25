@@ -7,7 +7,7 @@ const getUser = async ({ params }: Request, res: Response) => {
       const { username } = params;
       const response = await getUserSvc(username);
       const data = response ? response : "NOT_FOUND";
-      res.send(data);
+      res.status(200).send(data);
     } catch (e) {
       handleHttp(res, "ERROR_GET_USER");
     }
@@ -16,7 +16,7 @@ const getUser = async ({ params }: Request, res: Response) => {
   const getUsers = async (req: Request, res: Response) => {
     try {
       const response = await getUsersSvc();
-      res.send(response);
+      res.status(200).send(response);
     } catch (e) {
       handleHttp(res, "ERROR_GET_ITEMS");
     }
@@ -35,7 +35,7 @@ const getUser = async ({ params }: Request, res: Response) => {
   const createUser = async ({ body }: Request, res: Response) => {
     try {
       const responseItem = await insertUserSvc(body);
-      res.send(responseItem);
+      res.status(201).send(responseItem);
     } catch (e) {
       handleHttp(res, "ERROR_POST_USER", e);
     }
