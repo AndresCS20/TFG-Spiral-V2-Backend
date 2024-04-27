@@ -35,7 +35,7 @@ const unFollowUser = async ({ body }: Request, res: Response) => {
         res.status(200);
         res.send(data);
     } catch (e) {
-        handleHttp(res, "ERROR_DELETE_FOLLOW");
+        handleHttp(res, "ERROR_DELETE_FOLLOW", e);
     }
 }
 

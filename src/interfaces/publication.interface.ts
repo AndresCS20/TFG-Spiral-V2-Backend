@@ -1,5 +1,16 @@
 import mongoose from "mongoose";
 
+export const ReactionType = [
+    "LIKE",
+    "DISLIKE",
+    "LOVE",
+    "HAHA",
+    "WOW",
+    "SAD",
+    "ANGRY"
+]
+
+
 export interface Publication {
     _id: string;
     content: string;
@@ -12,13 +23,13 @@ export interface Publication {
     updatedAt: Date;
 }
 
-interface Reaction{
+export interface Reaction{
     user: mongoose.Types.ObjectId;
-    type: string;
+    type: String;
     date: Date;
 }
 
-interface Comment{
+export interface Comment{
     user: mongoose.Types.ObjectId;
     content: string;
     date: Date;

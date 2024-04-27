@@ -1,4 +1,4 @@
-import { createCommunity, deleteCommunity, getAllCommunities, getCommunityMembers, getOneCommunity, getUserCommunities, isUserMemberOfCommunity, isUserOwnerOfCommunity, joinCommunity, leaveCommunity, updateCommunity } from "@controllers/community.controller";
+import { createCommunity, deleteCommunity, getAllCommunities, getCommunityMembers, getOneCommunity, isUserMemberOfCommunity, isUserOwnerOfCommunity, joinCommunity, leaveCommunity, updateCommunity } from "@controllers/community.controller";
 import { Router } from "express";
 
 const router = Router();
@@ -10,7 +10,7 @@ router
 .post('/', createCommunity) 
 .patch('/:shortname', updateCommunity) 
 .delete("/:shortname", deleteCommunity) 
-.get('/user/:username', getUserCommunities) // Obtener las comunidades de un usuario específico
+// .get('/user/:username', getUserCommunities) // Obtener las comunidades de un usuario específico
 .post('/user/:shortname/ismember', isUserMemberOfCommunity) 
 .post('/user/:shortname/isowner', isUserOwnerOfCommunity) 
 .post('/user/:shortname/join', joinCommunity) 

@@ -18,12 +18,12 @@ export interface User extends Auth {
   updatedAt: Date;
 }
 
-interface Follow {
+export interface Follow {
   user: mongoose.Types.ObjectId;
   date: Date;
 }
 
-interface Community {
+export interface Community {
   community: mongoose.Types.ObjectId;
   date: Date;
 }

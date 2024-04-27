@@ -70,7 +70,7 @@ const isUserMemberOfCommunity = async (req: Request, res: Response) => {
             break;
         }
     } catch (e) {
-        handleHttp(res, "ERROR_MEMBER_COMMUNITY");
+        handleHttp(res, "ERROR_MEMBER_COMMUNITY",e);
     }
 }
 
@@ -96,7 +96,7 @@ const isUserOwnerOfCommunity = async (req: Request, res: Response) => {
         }
 
     } catch (e) {
-        handleHttp(res, "ERROR_OWNER_COMMUNITY");
+        handleHttp(res, "ERROR_OWNER_COMMUNITY",e);
     }
 
 }
@@ -125,7 +125,7 @@ const joinCommunity = async (req: Request, res: Response) => {
         }
 
     } catch (e) {
-        handleHttp(res, "ERROR_JOIN_COMMUNITY");
+        handleHttp(res, "ERROR_JOIN_COMMUNITY",e);
     }
 }
 
@@ -151,7 +151,7 @@ const leaveCommunity = async (req: Request, res: Response) => {
         }
 
     } catch (e) {
-        handleHttp(res, "ERROR_LEAVE_COMMUNITY");
+        handleHttp(res, "ERROR_LEAVE_COMMUNITY",e);
     }
 }
 
@@ -166,7 +166,7 @@ const updateCommunity = async (req: Request, res: Response) => {
         }
         res.status(200).send(response);
     } catch (e) {
-        handleHttp(res, "ERROR_UPDATE_COMMUNITY");
+        handleHttp(res, "ERROR_UPDATE_COMMUNITY",e);
     }
 }
 
@@ -181,13 +181,10 @@ const deleteCommunity = async (req: Request, res: Response) => { //TODO: Elimina
         }
         res.status(200).send(response);
     } catch (e) {
-        handleHttp(res, "ERROR_DELETE_COMMUNITY");
+        handleHttp(res, "ERROR_DELETE_COMMUNITY",e);
     }
 
 }
-
-
-const getUserCommunities = async (req: Request, res: Response) => {} //TODO DUDA: ¿Este metodo debe estar en este controlador o en el de usuario?
 
 
 export {
@@ -195,7 +192,6 @@ export {
     getOneCommunity,
     getCommunityMembers,
     createCommunity,
-    getUserCommunities,
     isUserMemberOfCommunity,
     isUserOwnerOfCommunity,
     joinCommunity,

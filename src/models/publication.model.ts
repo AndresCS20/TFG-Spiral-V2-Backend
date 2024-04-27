@@ -2,14 +2,14 @@ import mongoose, { Schema, Types, model } from "mongoose";
 import { Publication } from "../interfaces/publication.interface";
 
 const ReactionSchema = new Schema({
-  user: { type: Types.ObjectId, ref: "users" },
-  type: { type: String },
+  user: { type: Types.ObjectId, ref: "users", required: true},
+  type: { type: String, required: true},
   date: { type: Date, default: Date.now },
 });
 
 const CommentSchema = new Schema({
-  user: { type: Types.ObjectId, ref: "users" },
-  content: { type: String },
+  user: { type: Types.ObjectId, ref: "users", required: true},
+  content: { type: String, required: true},
   date: { type: Date, default: Date.now },
 });
 

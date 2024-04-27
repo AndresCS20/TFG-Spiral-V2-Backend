@@ -1,14 +1,25 @@
-import { deleteUser, getUser, getUsers, updateUser } from "@controllers/user.controller"
+import { addCommentToPublicationController, deleteCommentFromPublicationController } from "@controllers/comment.controller";
+import { createPublicationController, deletePublicationController, getAllPublicationsController, getFollowingPublicationsController, getOnePublicationController, updatePublicationController } from "@controllers/publication.controller";
+import { addReactionToPublicationController, deleteReactionFromPublicationController } from "@controllers/reaction.controller";
 import { Router } from "express";
 
 const router = Router();
 
 router
-    .get('/', getUsers)
-    .get('/:username', getUser)
-    // .post('/', createUser)
-    .patch('/:username', updateUser)
-    .delete("/:username", deleteUser)
+    .get('/:username/following', getFollowingPublicationsController)
+    .get('/', getAllPublicationsController)
+    .get('/:publicationId', getOnePublicationController)
+    .post('/', createPublicationController)
+    .patch('/:publicationId', updatePublicationController)
+    .delete("/:publicationId", deletePublicationController)
 
+    // Endpoints para comentarios
+    .post("/:publicationId/comments", addCommentToPublicationController)
+    .delete("/:publicationId/comments/:commentId", deleteCommentFromPublicationController)
+    
+    // Endpoints para reacciones
+    .post("/:publicationId/reactions", addReactionToPublicationController)
+    .delete("/:publicationId/reactions/:reactionId", deleteReactionFromPublicationController)
+    
 
 export { router };
