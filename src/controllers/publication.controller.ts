@@ -24,7 +24,8 @@ const getFollowingPublicationsController = async (req: Request, res: Response) =
 // Obtener todas las publicaciones
 const getAllPublicationsController = async (req: Request, res: Response) => {
   try {
-    const allPublications = await getAllPublicationsSvc();
+    const { communityId } = req.params;
+    const allPublications = await getAllPublicationsSvc(communityId);
     res.status(200).send(allPublications);
   } catch (error) {
     handleHttp(res, "ERROR_GET_ALL_PUBLICATIONS", error);

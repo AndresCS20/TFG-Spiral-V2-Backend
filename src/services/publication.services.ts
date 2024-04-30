@@ -28,11 +28,29 @@ const getFollowingPublicationsSvc = async (username: string) => {
   }
 };
 
-// Obtener todas las publicaciones
-const getAllPublicationsSvc = async () => {
+// Obtener todas las publicaciones 
+const getAllPublicationsSvc = async (communityId?: string) => {
   try {
-    const allPublications = await PublicationModel.find().populate("author", "username fullname profile_picture");
-    return allPublications;
+
+    if(communityId){
+
+      const idCommunity = new Types.ObjectId(communityId);
+      const allPublicationsCommunity = await PublicationModel.find({ community: idCommunity})
+      .populate("author", "username fullname profile_picture")
+      .populate("comments.user", "username fullname profile_picture")
+      .populate("reactions.user", "username profile_picture")
+
+      return allPublicationsCommunity;
+    } else{
+      const allPublications = await PublicationModel.find(
+        {community: { $exists: false }})
+      .populate("author", "username fullname profile_picture")
+      .populate("comments.user", "username fullname profile_picture")
+      .populate("reactions.user", "username profile_picture")
+
+      return allPublications;
+      }
+
   } catch (error) {
     console.error(error);
     throw new Error("Error al obtener todas las publicaciones");

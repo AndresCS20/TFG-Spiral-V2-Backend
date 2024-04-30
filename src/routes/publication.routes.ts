@@ -7,7 +7,7 @@ const router = Router();
 
 router
     .get('/:username/following', getFollowingPublicationsController)
-    .get('/', getAllPublicationsController)
+    .get('/:communityId?', getAllPublicationsController)
     .get('/:publicationId', getOnePublicationController)
     .post('/', createPublicationController)
     .patch('/:publicationId', updatePublicationController)
