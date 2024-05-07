@@ -7,6 +7,7 @@ export interface User extends Auth {
   fullname: string;
   description: string;
   profile_picture: string;
+  profile_picture_frame: string;
   banner_picture: string;
   ubication: string;
   link: string;

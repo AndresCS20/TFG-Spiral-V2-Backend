@@ -24,10 +24,15 @@ const authLogin = async ({ body }: Request, res: Response) => {
       res.status(200).send({
         id: user._id,
         username: user.username,
+        fullname: user.fullname,
         email: user.email,
         accessToken: responseUser.token,
+        profile_picture: user.profile_picture,
+        banner_picture: user.banner_picture
       });
   }
 };
+
+ 
 
 export { authLogin, authRegister };

@@ -29,6 +29,9 @@ const UserSchema = new Schema<User>(
     profile_picture: {
       type: String,
     },
+    profile_picture_frame:  {
+      type: String,
+    },
     banner_picture: {
       type: String,
     },
