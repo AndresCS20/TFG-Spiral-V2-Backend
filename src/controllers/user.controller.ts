@@ -7,7 +7,10 @@ const getUser = async ({ params }: Request, res: Response) => {
       const { username } = params;
       const response = await getOneUserSvc(username);
       const data = response ? response : "NOT_FOUND";
-      res.status(200).send(data);
+      return res.status(200).json({
+        status: 'success',
+        body: data,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_GET_USER", e);
     }
@@ -16,7 +19,10 @@ const getUser = async ({ params }: Request, res: Response) => {
   const getUsers = async (req: Request, res: Response) => {
     try {
       const response = await getAllUsersSvc();
-      res.status(200).send(response);
+      return res.status(200).json({
+        status: 'success',
+        body: response,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_GET_ITEMS", e);
     }
@@ -26,7 +32,10 @@ const getUser = async ({ params }: Request, res: Response) => {
     try {
       const { username } = params;
       const response = await updateUserSvc(username, body);
-      res.send(response);
+      return res.status(200).json({
+        status: 'success',
+        body: response,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_UPDATE_USER", e);
     }
@@ -35,7 +44,10 @@ const getUser = async ({ params }: Request, res: Response) => {
   const createUser = async ({ body }: Request, res: Response) => {
     try {
       const responseItem = await createUserSvc(body);
-      res.status(201).send(responseItem);
+      return res.status(201).json({
+        status: 'success',
+        body: responseItem,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_POST_USER", e);
     }
@@ -45,7 +57,10 @@ const getUser = async ({ params }: Request, res: Response) => {
     try {
       const { username } = params;
       const response = await deleteUserSvc(username);
-      res.send(response);
+      return res.status(200).json({
+        status: 'success',
+        body: response,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_DELETE_USER",e);
     }
@@ -56,7 +71,10 @@ const getUser = async ({ params }: Request, res: Response) => {
     try {
       const { username } = params;
       const response = await getFollowersOfUserSvc(username);
-      res.status(200).send(response);
+      return res.status(200).json({
+        status: 'success',
+        body: response,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_GET_FOLLOWERS", e);
     }
@@ -66,7 +84,10 @@ const getUser = async ({ params }: Request, res: Response) => {
     try {
       const { username } = params;
       const response = await getFollowingOfUserSvc(username);
-      res.status(200).send(response);
+      return res.status(200).json({
+        status: 'success',
+        body: response,
+      }); 
     } catch (e) {
       handleHttp(res, "ERROR_GET_FOLLOWS", e);
     }

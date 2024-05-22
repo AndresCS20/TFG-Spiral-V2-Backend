@@ -6,6 +6,18 @@ const MemberSchema: Schema = new Schema({
   date: { type: Date, default: Date.now },
 });
 
+const RuleSchema: Schema = new Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+})
+
+const ButtonSchema: Schema = new Schema({
+  title: { type: String, required: true },
+  url: { type: String, required: true },
+  icon: { type: String, required: true },
+  color: { type: String, required: true },
+})
+
 const CommunitySchema: Schema = new Schema<Community>({
   shortname: { type: String, required: true },
   fullname: { type: String, required: true },
@@ -14,6 +26,12 @@ const CommunitySchema: Schema = new Schema<Community>({
   banner_picture: { type: String },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
   members: [MemberSchema],
+  rules: [RuleSchema],
+  buttons: [ButtonSchema],
+},
+  {
+  versionKey: false, // Desactiva la inclusión de la propiedad "__v"
+  timestamps: true, // Crea automáticamente las propiedades "createdAt" y "updatedAt"
 });
 
 const CommunityModel = model("communities", CommunitySchema);

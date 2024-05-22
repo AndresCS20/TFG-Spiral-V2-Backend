@@ -36,17 +36,18 @@ const getAllPublicationsSvc = async (communityId?: string) => {
 
       const idCommunity = new Types.ObjectId(communityId);
       const allPublicationsCommunity = await PublicationModel.find({ community: idCommunity})
-      .populate("author", "username fullname profile_picture")
-      .populate("comments.user", "username fullname profile_picture")
-      .populate("reactions.user", "username profile_picture")
+      .populate("author", "username fullname profile_picture profile_picture_frame")
+      .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("community", "shortname fullname profile_picture")
 
       return allPublicationsCommunity;
     } else{
       const allPublications = await PublicationModel.find(
         {community: { $exists: false }})
-      .populate("author", "username fullname profile_picture")
-      .populate("comments.user", "username fullname profile_picture")
-      .populate("reactions.user", "username profile_picture")
+      .populate("author", "username fullname profile_picture profile_picture_frame")
+      .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+      .populate("reactions.user", "username profile_picture profile_picture_frame")
 
       return allPublications;
       }
@@ -60,7 +61,7 @@ const getAllPublicationsSvc = async (communityId?: string) => {
 // Obtener una publicación por su ID
 const getOnePublicationSvc = async (publicationId: string) => {
   try {
-    const publication = await PublicationModel.findById(publicationId).populate("author", "username fullname profile_picture");
+    const publication = await PublicationModel.findById(publicationId).populate("author", "username fullname profile_picture profile_picture_frame");
     return publication;
   } catch (error) {
     throw new Error("Error al obtener la publicación");

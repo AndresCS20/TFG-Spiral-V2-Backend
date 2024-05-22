@@ -9,8 +9,12 @@ import { Types } from "mongoose";
 // Obtener todos los usuarios
 const getAllUsersSvc = async () => {
   try {
-    const allPublications = await UserModel.find().populate("communities", "shortname fullname profile_picture").populate("following", "username fullname profile_picture").populate("followers", "username fullname profile_picture");
-    return allPublications;
+    const allUsers = await UserModel.find()
+    .select("-password")
+    .populate("communities.community", "shortname fullname profile_picture banner_picture")
+    .populate("following.user", "username fullname profile_picture banner_picture profile_picture_frame")
+    .populate("followers.user", "username fullname profile_picture banner_picture profile_picture_frame");
+    return allUsers;
   } catch (error) {
     console.error(error);
     throw new Error("Error al obtener todos los usuarios: " + error);
@@ -20,8 +24,12 @@ const getAllUsersSvc = async () => {
 // Obtener un usuario por username
 const getOneUserSvc = async (username: string) => {
   try {
-    const publication = await UserModel.findOne({username: username}).populate("communities", "shortname fullname profile_picture").populate("following", "username fullname profile_picture").populate("followers", "username fullname profile_picture");
-    return publication;
+    const user = await UserModel.findOne({username: username})
+    .select("-password")
+    .populate("communities.community", "shortname fullname profile_picture banner_picture")
+    .populate("following.user", "username fullname profile_picture banner_picture profile_picture_frame")
+    .populate("followers.user", "username fullname profile_picture banner_picture profile_picture_frame");
+    return user;
   } catch (error) {
     throw new Error("Error al obtener el usuario: " + error);
   }
@@ -30,8 +38,8 @@ const getOneUserSvc = async (username: string) => {
 // Crear un nuevo usuario
 const createUserSvc = async (user: User) => {
   try {
-    const newPublication = await UserModel.create(user);
-    return newPublication;
+    const newUser = await UserModel.create(user);
+    return newUser;
   } catch (error) {
     throw new Error("Error al crear la publicación");
   }
@@ -108,13 +116,14 @@ try {
       try {
         // Buscar el usuario por su ID y obtener el array de IDs de seguidores
         // const user = await UserModel.findById(user);
-        const userFollowers = await UserModel.find({ username: username}, 'followers -_id').populate("followers.user", "username fullname profile_picture");
+        const userFollowers = await UserModel.findOne({ username: username}, 'followers -_id')
+        .populate("followers.user", "username fullname profile_picture banner_picture profile_picture_frame");
         if (!userFollowers) {
           throw new Error("Usuario no encontrado");
         }
     
 
-        return userFollowers;
+        return userFollowers.followers;
 
 
       } catch (error) {
@@ -124,7 +133,8 @@ try {
 
     const getFollowingOfUserSvc = async (username: string) => {
       try {
-        const userFollowing = await UserModel.findOne({ username: username}, 'following -_id').populate("following.user", "username fullname profile_picture");
+        const userFollowing = await UserModel.findOne({ username: username}, 'following -_id')
+        .populate("following.user", "username fullname profile_picture banner_picture profile_picture_frame");
         if (!userFollowing) {
           throw new Error("Usuario no encontrado");
         }

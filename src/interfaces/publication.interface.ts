@@ -19,6 +19,8 @@ export interface Publication {
     community: mongoose.Types.ObjectId;
     reactions: Reaction[];
     comments: Comment[];
+    images: string[];
+    video: string;
     createdAt: Date;
     updatedAt: Date;
 }

@@ -12,11 +12,18 @@ export interface User extends Auth {
   ubication: string;
   link: string;
   birth_date: Date;
+  interests: string[];
+  social_networks: SocialNetwork[];
   following: Follow[];
   followers: Follow[];
   communities: Community[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface SocialNetwork {
+  name: string;
+  link: string;
 }
 
 export interface Follow {

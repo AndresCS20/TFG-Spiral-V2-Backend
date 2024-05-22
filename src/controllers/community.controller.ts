@@ -7,7 +7,11 @@ const getAllCommunities = async (req: Request, res: Response) => {
 
     try {
         const communities = await getCommunitiesSvc();
-        res.status(200).send(communities);
+        return res.status(200).json({
+            status: 'success',
+            body: communities,
+          });
+        // res.status(200).send(communities);
     } catch (e) {
         handleHttp(res, "ERROR_GET_COMMUNITIES", e);
     }
@@ -17,10 +21,15 @@ const getOneCommunity = async (req: Request, res: Response) => {
         const { shortname } = req.params;
         const community = await getCommunitySvc(shortname);
         if (!community) {
-            res.status(404).send({ message: 'Comunidad no encontrada' });
-            return;
+            return res.status(404).json({
+                status: 'error',
+                error: 'Comunidad no encontrada',
+              });
         }
-        res.status(200).send(community);
+        return res.status(200).json({
+            status: 'success',
+            body: community,
+          });
     } catch (e) {
         handleHttp(res, "ERROR_GET_COMMUNITY", e);
     }
@@ -32,10 +41,15 @@ const getCommunityMembers = async (req: Request, res: Response) => {
         const { shortname } = req.params;
         const community = await getCommunityMembersSvc(shortname);
         if (!community) {
-            res.status(404).send({ message: 'Comunidad no encontrada' });
-            return;
+            return res.status(404).json({
+                status: 'error',
+                error: 'Comunidad no encontrada',
+              });
         }
-        res.status(200).send(community.members);
+        return res.status(200).json({
+            status: 'success',
+            body: community.members,
+          });
     } catch (e) {
         handleHttp(res, "ERROR_GET_COMMUNITY_MEMBERS", e);
     }
@@ -45,7 +59,10 @@ const createCommunity = async (req: Request, res: Response) => {
     try {
         const community = req.body;
         const response = await insertCommunitySvc(community);
-        res.status(201).send(response);
+        return res.status(200).json({
+            status: 'success',
+            body: response,
+          });
     } catch (e) {
         handleHttp(res, "ERROR_CREATE_COMMUNITY", e);
     }
@@ -59,15 +76,21 @@ const isUserMemberOfCommunity = async (req: Request, res: Response) => {
         const response = await checkUserIsMemberSvc(shortname, userId);
         switch (response) {
             case null:
-                res.status(404).send({ message: 'Comunidad no encontrada' });
-            break;
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Comunidad no encontrada',
+                  });            
+
             case false:
-                res.status(404).send({ message: 'No eres miembro de la comunidad' });
-            break;    
-        
+                return res.status(403).json({
+                    status: 'error',
+                    error: 'No eres miembro de la comunidad',
+                  }); 
             default:
-                res.status(200).send({ message: 'Eres miembro de la comunidad' });
-            break;
+                return res.status(200).json({
+                    status: 'success',
+                    body: 'Eres miembro de la comunidad',
+                  });
         }
     } catch (e) {
         handleHttp(res, "ERROR_MEMBER_COMMUNITY",e);
@@ -84,14 +107,21 @@ const isUserOwnerOfCommunity = async (req: Request, res: Response) => {
 
         switch (response) {
             case null:
-                res.status(404).send({ message: 'Comunidad no encontrada' });
-            break;
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Comunidad no encontrada',
+                  });
             case false:
-                res.status(404).send({ message: 'No eres el dueño de la comunidad' });
-            break;    
+                return res.status(403).json({
+                    status: 'error',
+                    error: 'No eres el dueño de la comunidad',
+                  });
         
             default:
-                res.status(200).send({ message: 'Eres el propietario de la comunidad' });
+                return res.status(200).json({
+                    status: 'success',
+                    body: 'Eres el propietario de la comunidad',
+                  });
             break;
         }
 
@@ -109,18 +139,26 @@ const joinCommunity = async (req: Request, res: Response) => {
 
         switch (response) {
             case null:
-                res.status(404).send({ message: 'Comunidad no encontrada' });
-            break;
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Comunidad no encontrada',
+                  });            break;
             case false:
-                res.status(404).send({ message: 'Ya eres miembro de la comunidad' });
-            break;   
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Ya eres miembros de la comunidad',
+                  });
             
             case "ERROR_INSERT_USER_COMMUNITY":
-                res.status(404).send({ message: 'Error al insertar la comunidad en el usuario' });
-            break; 
-        
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Error al insertar la comunidad en el usuario',
+                  });        
             default:
-                res.status(200).send(response);
+                return res.status(200).json({
+                    status: 'success',
+                    body: response,
+                  });
             break;
         }
 
@@ -137,17 +175,25 @@ const leaveCommunity = async (req: Request, res: Response) => {
 
         switch (response) {
             case null:
-                res.status(404).send({ message: 'Comunidad no encontrada' });
-            break;
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Comunidad no encontrada',
+                  }); 
             case false:
-                res.status(404).send({ message: 'No eres miembro de la comunidad' });
-            break;    
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'No eres miembro de la comunidad',
+                  });    
             case "ERROR_REMOVE_USER_COMMUNITY":
-                res.status(404).send({ message: 'Error al eliminar la comunidad en el usuario' });
-            break; 
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Error al eliminar la comunidad del usuario',
+                  }); 
             default:
-                res.status(200).send(response);
-            break;
+                return res.status(200).json({
+                    status: 'success',
+                    body: response,
+                  });
         }
 
     } catch (e) {
@@ -161,10 +207,15 @@ const updateCommunity = async (req: Request, res: Response) => {
         const data = req.body;
         const response = await updateCommunitySvc(shortname, data);
         if(response.modifiedCount === 0){
-            res.status(404).send({ message: 'Comunidad no encontrada' });
-            return;
+            return res.status(404).json({
+                status: 'error',
+                message: 'Comunidad no encontrada',
+              });
         }
-        res.status(200).send(response);
+        return res.status(200).json({
+            status: 'success',
+            body: response,
+          });
     } catch (e) {
         handleHttp(res, "ERROR_UPDATE_COMMUNITY",e);
     }
@@ -176,10 +227,16 @@ const deleteCommunity = async (req: Request, res: Response) => { //TODO: Elimina
         const { shortname } = req.params;
         const response = await deleteCommunitySvc(shortname);
         if(response.deletedCount === 0){
-            res.status(404).send({ message: 'Comunidad no encontrada' });
+            return res.status(404).json({
+                status: 'error',
+                message: 'Comunidad no encontrada',
+              });
             return;
         }
-        res.status(200).send(response);
+        return res.status(200).json({
+            status: 'success',
+            body: response,
+          });
     } catch (e) {
         handleHttp(res, "ERROR_DELETE_COMMUNITY",e);
     }

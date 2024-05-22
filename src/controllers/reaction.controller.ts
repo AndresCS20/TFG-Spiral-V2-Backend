@@ -20,7 +20,10 @@ const addReactionToPublicationController = async (req: Request, res: Response) =
     };
 
     const updatedPublication = await addReactionToPublication(publicationId, reaction);
-    res.status(200).send(updatedPublication);
+    return res.status(200).json({
+      status: 'success',
+      body: updatedPublication,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_ADD_REACTION", error);
   }
@@ -31,7 +34,10 @@ const deleteReactionFromPublicationController = async (req: Request, res: Respon
   try {
     const { publicationId, reactionId } = req.params;
     const updatedPublication = await deleteReactionFromPublication(publicationId, reactionId);
-    res.status(200).send(updatedPublication);
+    return res.status(200).json({
+      status: 'success',
+      body: updatedPublication,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_DELETE_REACTION", error);
   }

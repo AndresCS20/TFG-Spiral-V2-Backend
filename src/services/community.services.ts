@@ -10,12 +10,15 @@ const insertCommunitySvc = async (community: Community) => {
 };
 
 const getCommunitiesSvc = async () => {
-  const responseItem = await CommunityModel.find({});
+  //Orden de más antiguo a más reciente
+  const responseItem = await CommunityModel.find({}).sort({ createdAt: 1 });
   return responseItem;
 };
 
 const getCommunitySvc = async (shortname: string) => {
-  const responseItem = await CommunityModel.findOne({ shortname: shortname });
+  const responseItem = await CommunityModel.findOne({ shortname: shortname })
+  .populate('members.user', 'fullname username profile_picture banner_picture profile_picture_frame')
+  .populate('owner', 'fullname username profile_picture profile_picture_frame');
   return responseItem;
 };
 

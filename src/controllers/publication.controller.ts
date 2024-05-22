@@ -9,13 +9,17 @@ import {
 } from "@services/publication.services"
 import { handleHttp } from "../utils/error.handle";
 import { Publication } from "@interfaces/publication.interface";
+import { getCommunitySvc } from "@services/community.services";
 
 // Obtener todas las publicaciones de los usuarios seguidos
 const getFollowingPublicationsController = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
     const followingPublications = await getFollowingPublicationsSvc(username);
-    res.status(200).send(followingPublications);
+    return res.status(200).json({
+      status: 'success',
+      body: followingPublications,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_GET_FOLLOWING_PUBLICATIONS", error);
   }
@@ -24,9 +28,25 @@ const getFollowingPublicationsController = async (req: Request, res: Response) =
 // Obtener todas las publicaciones
 const getAllPublicationsController = async (req: Request, res: Response) => {
   try {
-    const { communityId } = req.params;
+    const { communityShortname } = req.params;
+    let communityId: string | undefined = undefined;
+    if (communityShortname) {
+      const community = await getCommunitySvc(communityShortname);
+      if (!community) {
+        return res.status(404).json({
+          status: 'error',
+          error: 'Comunidad no encontrada',
+        });
+      }
+      communityId = community._id as string;
+      console.log(communityId);
+    }
+    console.log(communityId);
     const allPublications = await getAllPublicationsSvc(communityId);
-    res.status(200).send(allPublications);
+    return res.status(200).json({
+      status: 'success',
+      body: allPublications,
+    });   
   } catch (error) {
     handleHttp(res, "ERROR_GET_ALL_PUBLICATIONS", error);
   }
@@ -38,9 +58,15 @@ const getOnePublicationController = async (req: Request, res: Response) => {
     const { publicationId } = req.params;
     const publication = await getOnePublicationSvc(publicationId);
     if (!publication) {
-      return res.status(404).send({ message: "Publicación no encontrada" });
+      return res.status(404).json({
+        status: 'error',
+        error: 'Publicación no encontrada',
+      }); 
     }
-    res.status(200).send(publication);
+    return res.status(200).json({
+      status: 'success',
+      body: publication,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_GET_ONE_PUBLICATION", error);
   }
@@ -51,7 +77,10 @@ const createPublicationController = async (req: Request, res: Response) => {
   try {
     const publication : Publication = req.body;
     const newPublication = await createPublicationSvc(publication);
-    res.status(201).send(newPublication);
+    return res.status(201).json({
+      status: 'success',
+      body: newPublication,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_CREATE_PUBLICATION", error);
   }
@@ -64,9 +93,15 @@ const updatePublicationController = async (req: Request, res: Response) => {
     const updatedPublication : Publication= req.body;
     const updated = await updatePublicationSvc(publicationId, updatedPublication);
     if (!updated) {
-      return res.status(404).send({ message: "Publicación no encontrada" });
+      return res.status(404).json({
+        status: 'error',
+        error: 'Publicación no encontrada',
+      }); 
     }
-    res.status(200).send(updated);
+    return res.status(200).json({
+      status: 'success',
+      body: updated,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_UPDATE_PUBLICATION", error);
   }
@@ -78,9 +113,15 @@ const deletePublicationController = async (req: Request, res: Response) => {
     const { publicationId } = req.params;
     const deletedPublication = await deletePublicationSvc(publicationId);
     if (!deletedPublication) {
-      return res.status(404).send({ message: "Publicación no encontrada" });
+      return res.status(404).json({
+        status: 'error',
+        error: 'Publicación no encontrada',
+      }); 
     }
-    res.status(200).send({ message: "Publicación eliminada correctamente" });
+    return res.status(200).json({
+      status: 'success',
+      body: deletedPublication,
+    }); 
   } catch (error) {
     handleHttp(res, "ERROR_DELETE_PUBLICATION", error);
   }

@@ -30,6 +30,8 @@ const PublicationSchema = new Schema<Publication>(
     },
     reactions: [ReactionSchema],
     comments: [CommentSchema],
+    images: [String],
+    video: String
   },
   {
     versionKey: false,

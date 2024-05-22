@@ -41,6 +41,23 @@ const UserSchema = new Schema<User>(
     birth_date: {
       type: Date,
     },
+    interests: { 
+      type: [String],
+       default: [] 
+    },
+    social_networks: {
+      type: [
+        {
+          name: {
+            type: String,
+          },
+          url: {
+            type: String,
+          },
+        },
+      ],
+      default : []
+    },
     following: {
       type: [
         {

@@ -15,7 +15,10 @@ const addCommentToPublicationController = async (req: Request, res: Response) =>
     };
 
     const updatedPublication = await addCommentToPublication(publicationId, comment);
-    res.status(200).send(updatedPublication);
+    return res.status(200).json({
+      status: 'success',
+      body: updatedPublication,
+    });
   } catch (error) {
     handleHttp(res, "ERROR_ADD_COMMENT", error);
   }
@@ -26,7 +29,10 @@ const deleteCommentFromPublicationController = async (req: Request, res: Respons
   try {
     const { publicationId, commentId } = req.params;
     const updatedPublication = await deleteCommentFromPublication(publicationId, commentId);
-    res.status(200).send(updatedPublication);
+    return res.status(200).json({
+      status: 'success',
+      body: updatedPublication,
+    });
   } catch (error) {
     handleHttp(res, "ERROR_DELETE_COMMENT", error);
   }
