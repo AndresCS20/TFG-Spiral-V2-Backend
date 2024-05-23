@@ -117,7 +117,7 @@ try {
         // Buscar el usuario por su ID y obtener el array de IDs de seguidores
         // const user = await UserModel.findById(user);
         const userFollowers = await UserModel.findOne({ username: username}, 'followers -_id')
-        .populate("followers.user", "username fullname profile_picture banner_picture profile_picture_frame");
+        .populate("followers.user", "username fullname profile_picture banner_picture profile_picture_frame followers following");
         if (!userFollowers) {
           throw new Error("Usuario no encontrado");
         }
@@ -134,7 +134,7 @@ try {
     const getFollowingOfUserSvc = async (username: string) => {
       try {
         const userFollowing = await UserModel.findOne({ username: username}, 'following -_id')
-        .populate("following.user", "username fullname profile_picture banner_picture profile_picture_frame");
+        .populate("following.user", "username fullname profile_picture banner_picture profile_picture_frame followers following");
         if (!userFollowing) {
           throw new Error("Usuario no encontrado");
         }

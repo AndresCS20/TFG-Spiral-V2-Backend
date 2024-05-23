@@ -1,7 +1,58 @@
 import PublicationModel from "../models/publication.model";
 import { Publication } from "../interfaces/publication.interface";
 import { Types } from "mongoose";
-import { getFollowingOfUserSvc } from "./user.services";
+import { getFollowingOfUserSvc, getOneUserSvc } from "./user.services";
+import UserModel from "@models/user.model";
+
+// Obtener todas las imágenes de todas las publicaciones de un usuario
+const getAllPublicationImagesSvc = async (username: string) => {
+  try {
+    const user = await UserModel.findOne({ username });
+    const userId = user?._id;
+
+    if (!userId) throw new Error("Usuario no encontrado");
+
+    const publications = await PublicationModel.find({
+      author: userId,
+      // community: { $exists: false }
+    });
+
+    const images: string[] = [];
+
+    publications.forEach((publication) => {
+      images.push(...publication.images);
+    });
+
+    return images;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al obtener las imágenes de las publicaciones del usuario");
+  }
+};
+
+const getUserPublicationsSvc = async (username: string) => {
+  try {
+
+    const user = await UserModel.findOne({ username });
+    const userId = user?._id;
+
+    if(!userId) throw new Error("Usuario no encontrado");
+
+    const publications = await PublicationModel.find({
+      author: userId,
+      // community: { $exists: false }
+    })
+      .populate("author", "username fullname profile_picture profile_picture_frame")
+      .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("community", "shortname fullname profile_picture");
+
+    return publications;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al obtener las publicaciones del usuario");
+  }
+};
 
 
 //Obtener todas las publicaciones de los usuarios seguidos
@@ -20,7 +71,7 @@ const getFollowingPublicationsSvc = async (username: string) => {
     const followingPublications = await PublicationModel.find({
       author: { $in: followingIds }, // Filtrar por autores que el usuario sigue
       community: { $exists: false },
-    }).populate("author", "username");
+    }).populate("author", "username fullname profile_picture profile_picture_frame");
     
     return followingPublications;
   } catch (error) {
@@ -99,6 +150,7 @@ const deletePublicationSvc = async (publicationId: string) => {
 };
 
 export {
+  getUserPublicationsSvc,
   getFollowingPublicationsSvc,
   getAllPublicationsSvc,
   getOnePublicationSvc,

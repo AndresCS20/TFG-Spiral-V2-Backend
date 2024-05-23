@@ -6,6 +6,7 @@ import {
   createPublicationSvc,
   updatePublicationSvc,
   deletePublicationSvc,
+  getUserPublicationsSvc,
 } from "@services/publication.services"
 import { handleHttp } from "../utils/error.handle";
 import { Publication } from "@interfaces/publication.interface";
@@ -51,6 +52,20 @@ const getAllPublicationsController = async (req: Request, res: Response) => {
     handleHttp(res, "ERROR_GET_ALL_PUBLICATIONS", error);
   }
 };
+
+const getPublicationsOfUser = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const publications = await getUserPublicationsSvc(username);
+    return res.status(200).json({
+      status: 'success',
+      body: publications,
+    }); 
+  } catch (error) {
+    handleHttp(res, "ERROR_GET_USER_PUBLICATIONS", error);
+  }
+}
+
 
 // Obtener una publicación por su ID
 const getOnePublicationController = async (req: Request, res: Response) => {
@@ -128,6 +143,7 @@ const deletePublicationController = async (req: Request, res: Response) => {
 };
 
 export {
+  getPublicationsOfUser,
   getFollowingPublicationsController,
   getAllPublicationsController,
   getOnePublicationController,
