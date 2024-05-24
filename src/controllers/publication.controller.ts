@@ -7,10 +7,40 @@ import {
   updatePublicationSvc,
   deletePublicationSvc,
   getUserPublicationsSvc,
+  getNonFollowingPublicationsSvc,
+  getUserCommunitiesPublicationsSvc,
 } from "@services/publication.services"
 import { handleHttp } from "../utils/error.handle";
 import { Publication } from "@interfaces/publication.interface";
 import { getCommunitySvc } from "@services/community.services";
+
+
+const getUserCommunitiesPublications = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const publications = await getUserCommunitiesPublicationsSvc(username);
+    return res.status(200).json({
+      status: 'success',
+      body: publications,
+    }); 
+  } catch (error) {
+    handleHttp(res, "ERROR_GET_USER_COMMUNITIES_PUBLICATIONS", error);
+  }
+
+}
+
+const getNonFollowingPublicationsController = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const nonFollowingPublications = await getNonFollowingPublicationsSvc(username);
+    return res.status(200).json({
+      status: 'success',
+      body: nonFollowingPublications,
+    }); 
+  } catch (error) {
+    handleHttp(res, "ERROR_GET_NON_FOLLOWING_PUBLICATIONS", error);
+  }
+}
 
 // Obtener todas las publicaciones de los usuarios seguidos
 const getFollowingPublicationsController = async (req: Request, res: Response) => {
@@ -143,7 +173,9 @@ const deletePublicationController = async (req: Request, res: Response) => {
 };
 
 export {
+  getUserCommunitiesPublications,
   getPublicationsOfUser,
+  getNonFollowingPublicationsController,
   getFollowingPublicationsController,
   getAllPublicationsController,
   getOnePublicationController,
@@ -151,44 +183,3 @@ export {
   updatePublicationController,
   deletePublicationController,
 };
-
-
-
-// import { Request, Response } from "express"
-// import { handleHttp } from "../utils/error.handle"
-// import { deletePublicationSvc } from "@services/publication.services"
-
-// const getFollowingPublications = async ({ params }: Request, res: Response) => {}
-// const getAllPublications = async ({ params }: Request, res: Response) => {}
-// const getOnePublication = async ({ params }: Request, res: Response) => {}
-// const createPublication = async ({ params }: Request, res: Response) => {}
-// const updatePublication = async ({ params }: Request, res: Response) => {}
-// const deletePublication = async ({ params }: Request, res: Response) => {
-
-//     try {
-        
-//         const { id } = params;
-
-//         const response = await deletePublicationSvc(id);
-
-//         res.status(200).send(response)
-
-
-
-//     } catch (error) {
-//         handleHttp(res, "ERROR_DELETE_PUBLICATION", error);
-//     }
-
-
-// }
-
-
-
-// export{  
-//     getFollowingPublications,
-//     getAllPublications,
-//     getOnePublication,
-//     createPublication,
-//     updatePublication,
-//     deletePublication
-// }

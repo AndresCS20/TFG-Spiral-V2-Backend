@@ -26,7 +26,7 @@ const getOneUserSvc = async (username: string) => {
   try {
     const user = await UserModel.findOne({username: username})
     .select("-password")
-    .populate("communities.community", "shortname fullname profile_picture banner_picture")
+    .populate("communities.community", "shortname fullname profile_picture banner_picture createdAt members")
     .populate("following.user", "username fullname profile_picture banner_picture profile_picture_frame")
     .populate("followers.user", "username fullname profile_picture banner_picture profile_picture_frame");
     return user;

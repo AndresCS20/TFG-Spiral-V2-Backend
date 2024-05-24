@@ -5,70 +5,175 @@ import mongoose from "mongoose";
 import { joinCommunityUserSvc, leaveCommunityUserSvc } from "./user.services";
 
 const insertCommunitySvc = async (community: Community) => {
-  const responseInsert = await CommunityModel.create(community);
-  return responseInsert;
+  try {
+    const responseInsert = await CommunityModel.create(community);
+    return responseInsert;
+  } catch (error) {
+    console.error('Error inserting community:', error);
+    throw new Error('Error inserting community');
+  }
 };
 
 const getCommunitiesSvc = async () => {
-  //Orden de más antiguo a más reciente
-  const responseItem = await CommunityModel.find({}).sort({ createdAt: 1 });
-  return responseItem;
+  try {
+    //Orden de más antiguo a más reciente
+    const responseItem = await CommunityModel.find({}).sort({ createdAt: 1 });
+    return responseItem;
+  } catch (error) {
+    console.error('Error retrieving communities:', error);
+    throw new Error('Error retrieving communities');
+  }
 };
 
 const getCommunitySvc = async (shortname: string) => {
-  const responseItem = await CommunityModel.findOne({ shortname: shortname })
-  .populate('members.user', 'fullname username profile_picture banner_picture profile_picture_frame')
-  .populate('owner', 'fullname username profile_picture profile_picture_frame');
-  return responseItem;
+  try {
+    const responseItem = await CommunityModel.findOne({ shortname: shortname })
+      .populate('members.user', 'fullname username profile_picture banner_picture profile_picture_frame')
+      .populate('owner', 'fullname username profile_picture profile_picture_frame');
+    
+    if (!responseItem) {
+      throw new Error('Community not found');
+    }
+    return responseItem;
+  } catch (error) {
+    console.error('Error retrieving community:', error);
+    throw new Error('Error retrieving community');
+  }
 };
 
 const updateCommunitySvc = async (shortname: string, data: Community) => {
-  const responseItem = await CommunityModel.updateOne(
-    { shortname: shortname },
-    data,
-    {
-      new: true,
+  try {
+    const responseItem = await CommunityModel.updateOne(
+      { shortname: shortname },
+      data,
+      {
+        new: true,
+      }
+    );
+    
+    if (responseItem.modifiedCount === 0) {
+      throw new Error('Community not updated');
     }
-  );
-  return responseItem;
+    return responseItem;
+  } catch (error) {
+    console.error('Error updating community:', error);
+    throw new Error('Error updating community');
+  }
 };
 
 const deleteCommunitySvc = async (shortname: string) => {
-  const responseItem = await CommunityModel.deleteOne({ shortname: shortname });
-  return responseItem;
+  try {
+    const responseItem = await CommunityModel.deleteOne({ shortname: shortname });
+    
+    if (responseItem.deletedCount === 0) {
+      throw new Error('Community not deleted');
+    }
+    return responseItem;
+  } catch (error) {
+    console.error('Error deleting community:', error);
+    throw new Error('Error deleting community');
+  }
 };
 
-const removeUserFromCommunitySvc = async (shortname: string, userId: string) => { 
-
-  const community = await CommunityModel.findOne({ shortname: shortname }) as Community;
-
-    if(!community){
-        return null;
+const removeUserFromCommunitySvc = async (shortname: string, userId: string) => {
+  try {
+    const community = await CommunityModel.findOne({ shortname: shortname }) as Community;
+    
+    if (!community) {
+      throw new Error('Community not found');
     }
+    
     const user = new mongoose.Types.ObjectId(userId);
-
     const responseItem = await CommunityModel.updateOne(
-        { shortname: shortname },
-        { $pull: { members: { user: user } } },
-        { new: true }
+      { shortname: shortname },
+      { $pull: { members: { user: user } } },
+      { new: true }
     );
 
-    console.log(responseItem)
-
-    if(responseItem.modifiedCount===0){
-        return false;
+    if (responseItem.modifiedCount === 0) {
+      throw new Error('User not removed from community');
     }
+
     const communityId = community._id;
     const responseItem2 = await leaveCommunityUserSvc(userId, communityId);
 
-    if(responseItem2.modifiedCount===0){
-        return "ERROR_REMOVE_USER_COMMUNITY";
+    if (responseItem2.modifiedCount === 0) {
+      throw new Error('Error removing user from community service');
     }
-    else{
-      return responseItem;
-  }
 
-}
+    return responseItem;
+  } catch (error) {
+    console.error('Error removing user from community:', error);
+    throw new Error('Error removing user from community');
+  }
+};
+
+
+// const insertCommunitySvc = async (community: Community) => {
+//   const responseInsert = await CommunityModel.create(community);
+//   return responseInsert;
+// };
+
+// const getCommunitiesSvc = async () => {
+//   //Orden de más antiguo a más reciente
+//   const responseItem = await CommunityModel.find({}).sort({ createdAt: 1 });
+//   return responseItem;
+// };
+
+// const getCommunitySvc = async (shortname: string) => {
+//   const responseItem = await CommunityModel.findOne({ shortname: shortname })
+//   .populate('members.user', 'fullname username profile_picture banner_picture profile_picture_frame')
+//   .populate('owner', 'fullname username profile_picture profile_picture_frame');
+//   return responseItem;
+// };
+
+// const updateCommunitySvc = async (shortname: string, data: Community) => {
+//   const responseItem = await CommunityModel.updateOne(
+//     { shortname: shortname },
+//     data,
+//     {
+//       new: true,
+//     }
+//   );
+//   return responseItem;
+// };
+
+// const deleteCommunitySvc = async (shortname: string) => {
+//   const responseItem = await CommunityModel.deleteOne({ shortname: shortname });
+//   return responseItem;
+// };
+
+// const removeUserFromCommunitySvc = async (shortname: string, userId: string) => { 
+
+//   const community = await CommunityModel.findOne({ shortname: shortname }) as Community;
+
+//     if(!community){
+//         return null;
+//     }
+//     const user = new mongoose.Types.ObjectId(userId);
+
+//     const responseItem = await CommunityModel.updateOne(
+//         { shortname: shortname },
+//         { $pull: { members: { user: user } } },
+//         { new: true }
+//     );
+
+//     console.log(responseItem)
+
+//     if(responseItem.modifiedCount===0){
+//         return false;
+//     }
+//     const communityId = community._id;
+//     const responseItem2 = await leaveCommunityUserSvc(userId, communityId);
+
+//     if(responseItem2.modifiedCount===0){
+//         return "ERROR_REMOVE_USER_COMMUNITY";
+//     }
+//     else{
+//       return responseItem;
+//   }
+
+// }
 
 const addUserToCommunitySvc = async (shortname: string, userId: string) => {
   try {

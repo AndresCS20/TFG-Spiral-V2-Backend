@@ -30,6 +30,52 @@ const getAllPublicationImagesSvc = async (username: string) => {
   }
 };
 
+//////////////////////////////////////////////////////////////////////////
+
+const getUserCommunitiesPublicationsSvc = async (username: string) => {
+  try {
+    const user = await UserModel.findOne({ username });
+    if(!user) throw new Error("Usuario no encontrado");
+    const communities = user.communities;
+
+    const communitiesIds= communities.map(community => community.community);
+    console.log(communitiesIds);
+    const publications = await PublicationModel.find({
+      community: { $in: communitiesIds },
+    })
+      .populate("author", "username fullname profile_picture profile_picture_frame")
+      .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("community", "shortname fullname profile_picture");
+    return publications;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al obtener las publicaciones de las comunidades del usuario");
+  }
+};
+
+const getNonFollowingPublicationsSvc = async (username: string) => {
+  try {
+    // Obtener la lista de usuarios seguidos
+    const followingList = await getFollowingOfUserSvc(username);
+    console.log(followingList);
+
+    // Extraer solo los IDs de los usuarios seguidos
+    const followingIds = followingList.map(following => following.user._id);
+    console.log(followingIds);
+
+    // Buscar las publicaciones de los usuarios que no se siguen
+    const nonFollowingPublications = await PublicationModel.find({
+      author: { $nin: followingIds }, // Filtrar por autores que el usuario no sigue
+      community: { $exists: false },
+    })
+    .populate("author", "username fullname profile_picture profile_picture_frame");
+    
+    return nonFollowingPublications;
+  } catch (error) {
+    console.error(error);
+  }
+};
 const getUserPublicationsSvc = async (username: string) => {
   try {
 
@@ -71,7 +117,8 @@ const getFollowingPublicationsSvc = async (username: string) => {
     const followingPublications = await PublicationModel.find({
       author: { $in: followingIds }, // Filtrar por autores que el usuario sigue
       community: { $exists: false },
-    }).populate("author", "username fullname profile_picture profile_picture_frame");
+    })
+    .populate("author", "username fullname profile_picture profile_picture_frame");
     
     return followingPublications;
   } catch (error) {
@@ -150,7 +197,9 @@ const deletePublicationSvc = async (publicationId: string) => {
 };
 
 export {
+  getUserCommunitiesPublicationsSvc,
   getUserPublicationsSvc,
+  getNonFollowingPublicationsSvc,
   getFollowingPublicationsSvc,
   getAllPublicationsSvc,
   getOnePublicationSvc,
