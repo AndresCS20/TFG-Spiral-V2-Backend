@@ -75,38 +75,43 @@ const deleteCommunitySvc = async (shortname: string) => {
   }
 };
 
-const removeUserFromCommunitySvc = async (shortname: string, userId: string) => {
-  try {
-    const community = await CommunityModel.findOne({ shortname: shortname }) as Community;
-    
-    if (!community) {
-      throw new Error('Community not found');
-    }
-    
-    const user = new mongoose.Types.ObjectId(userId);
-    const responseItem = await CommunityModel.updateOne(
-      { shortname: shortname },
-      { $pull: { members: { user: user } } },
-      { new: true }
-    );
+const removeUserFromCommunitySvc = async (shortname: string, userId: string) => { 
 
-    if (responseItem.modifiedCount === 0) {
-      throw new Error('User not removed from community');
-    }
+ try {
+   const community = await CommunityModel.findOne({ shortname: shortname }) as Community;
+ 
+     if(!community){
+         return null;
+     }
+     const user = new mongoose.Types.ObjectId(userId);
+ 
+     const responseItem = await CommunityModel.updateOne(
+         { shortname: shortname },
+         { $pull: { members: { user: user } } },
+         { new: true }
+     );
+ 
+     console.log(responseItem)
+ 
+     if(responseItem.modifiedCount===0){
+         return false;
+     }
+     const communityId = community._id;
+     const responseItem2 = await leaveCommunityUserSvc(userId, communityId);
+ 
+     if(responseItem2.modifiedCount===0){
+         return "ERROR_REMOVE_USER_COMMUNITY";
+     }
+     else{
+       return responseItem;
+   }
+ } catch (error) {
+   console.error(error);
+   throw error;
+ }
 
-    const communityId = community._id;
-    const responseItem2 = await leaveCommunityUserSvc(userId, communityId);
+}
 
-    if (responseItem2.modifiedCount === 0) {
-      throw new Error('Error removing user from community service');
-    }
-
-    return responseItem;
-  } catch (error) {
-    console.error('Error removing user from community:', error);
-    throw new Error('Error removing user from community');
-  }
-};
 
 
 // const insertCommunitySvc = async (community: Community) => {

@@ -1,6 +1,20 @@
 import { Request, Response } from "express"
 import { handleHttp } from "../utils/error.handle"
-import {createUserSvc, getOneUserSvc, getAllUsersSvc, updateUserSvc, deleteUserSvc, getFollowersOfUserSvc, getFollowingOfUserSvc } from '@services/user.services'
+import {createUserSvc, getOneUserSvc, getAllUsersSvc, updateUserSvc, deleteUserSvc, getFollowersOfUserSvc, getFollowingOfUserSvc, getNonFollowingUsersSvc } from '@services/user.services'
+
+const getNonFollowingUsers = async (req: Request, res: Response) => {
+  
+  try {
+    const { username } = req.params;
+    const nonFollowingUsers = await getNonFollowingUsersSvc(username);
+    return res.status(200).json({
+      status: 'success',
+      body: nonFollowingUsers,
+    }); 
+  } catch (e) {
+    handleHttp(res, "ERROR_GET_NON_FOLLOWING_USERS", e);
+  }
+}
 
 const getUser = async ({ params }: Request, res: Response) => {
     try {
@@ -93,4 +107,4 @@ const getUser = async ({ params }: Request, res: Response) => {
     }
   }
 
-  export { getUser, getUsers, createUser, updateUser, deleteUser, getUserFollowers, getUserFollows };
+  export { getUser, getUsers, createUser, updateUser, deleteUser, getUserFollowers, getUserFollows , getNonFollowingUsers};

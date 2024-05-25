@@ -5,6 +5,33 @@ import { encrypt } from "./../utils/bcrypt.handle";
 import mongoose from "mongoose";
 import { Types } from "mongoose";
 
+const getNonFollowingUsersSvc = async (username: string) => {
+  try {
+
+
+    const user = await UserModel.findOne({ username });
+    if (!user) throw new Error("Usuario no encontrado");
+    const userId = new Types.ObjectId(user._id);
+    // Obtener la lista de usuarios seguidos
+    const followingList = await getFollowingOfUserSvc(username);
+
+    // Extraer solo los IDs de los usuarios seguidos
+    const followingIds = followingList.map(following => following.user._id.toString());
+    followingIds.push(userId.toString());
+    console.log(followingIds);
+
+    // Buscar las publicaciones de los usuarios que no se siguen
+    const nonFollowingUsers = await UserModel.find({
+      _id: { $nin: followingIds }, // Filtrar por autores que el usuario no sigue
+    });
+
+    return nonFollowingUsers;
+
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al obtener los usuarios no seguidos: " + error);
+  }
+}
 
 // Obtener todos los usuarios
 const getAllUsersSvc = async () => {
@@ -76,7 +103,7 @@ const createUserSvc = async (user: User) => {
     }
   };
 
-  const joinCommunityUserSvc = async (userId: string, communityId: string) => {
+const joinCommunityUserSvc = async (userId: string, communityId: string) => {
   
 try {
       const communityIdObj = new mongoose.Types.ObjectId(communityId).toString();
@@ -146,4 +173,4 @@ try {
       }
     };
   
-  export { createUserSvc, getOneUserSvc, getAllUsersSvc, updateUserSvc, deleteUserSvc, joinCommunityUserSvc, leaveCommunityUserSvc, getFollowersOfUserSvc, getFollowingOfUserSvc };
+  export { createUserSvc, getOneUserSvc, getAllUsersSvc, getNonFollowingUsersSvc,updateUserSvc, deleteUserSvc, joinCommunityUserSvc, leaveCommunityUserSvc, getFollowersOfUserSvc, getFollowingOfUserSvc };

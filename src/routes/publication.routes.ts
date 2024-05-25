@@ -1,5 +1,5 @@
 import { addCommentToPublicationController, deleteCommentFromPublicationController } from "@controllers/comment.controller";
-import { createPublicationController, deletePublicationController, getAllPublicationsController, getFollowingPublicationsController, getOnePublicationController, getPublicationsOfUser, getUserCommunitiesPublications, updatePublicationController } from "@controllers/publication.controller";
+import { createPublicationController, deletePublicationController, getAllPublicationsController, getFollowingPublicationsController, getNonFollowingPublicationsController, getOnePublicationController, getPublicationsOfUser, getUserCommunitiesPublications, updatePublicationController } from "@controllers/publication.controller";
 import { addReactionToPublicationController, deleteReactionFromPublicationController } from "@controllers/reaction.controller";
 import { Router } from "express";
 
@@ -8,7 +8,8 @@ const router = Router();
 router
     .get('/user/:username', getPublicationsOfUser)
     .get('/:username/following', getFollowingPublicationsController)
-    .get('/:username/communities', getUserCommunitiesPublications) //TODO: 23/05/2024 Hay que hacer el controlador y servicio
+    .get('/:username/communities', getUserCommunitiesPublications) 
+    .get('/:username/global', getNonFollowingPublicationsController)
     .get('/:communityShortname?', getAllPublicationsController)
     .get('/one/:publicationId', getOnePublicationController)
     .post('/', createPublicationController)

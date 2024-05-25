@@ -56,12 +56,17 @@ const getUserCommunitiesPublicationsSvc = async (username: string) => {
 
 const getNonFollowingPublicationsSvc = async (username: string) => {
   try {
+
+    const user = await UserModel.findOne({ username });
+    if(!user) throw new Error("Usuario no encontrado");
+    const userId = new Types.ObjectId(user._id);
     // Obtener la lista de usuarios seguidos
     const followingList = await getFollowingOfUserSvc(username);
     console.log(followingList);
 
     // Extraer solo los IDs de los usuarios seguidos
     const followingIds = followingList.map(following => following.user._id);
+    followingIds.push(userId);
     console.log(followingIds);
 
     // Buscar las publicaciones de los usuarios que no se siguen
