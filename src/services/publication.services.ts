@@ -164,7 +164,8 @@ const getAllPublicationsSvc = async (communityId?: string) => {
 // Obtener una publicación por su ID
 const getOnePublicationSvc = async (publicationId: string) => {
   try {
-    const publication = await PublicationModel.findById(publicationId).populate("author", "username fullname profile_picture profile_picture_frame");
+    const publication = await PublicationModel.findById(publicationId)
+    .populate("author", "username fullname profile_picture profile_picture_frame");
     return publication;
   } catch (error) {
     throw new Error("Error al obtener la publicación");

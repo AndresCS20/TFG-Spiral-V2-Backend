@@ -39,4 +39,18 @@ const loginUser = async ({ username, password }: Auth) => {
   return data;
 };
 
-export { registerNewUser, loginUser };
+const checkPasswordSvc = async ({username,password}: Auth) => {
+
+  const checkIs = await UserModel.findOne({ username });
+  if (!checkIs) return "NOT_FOUND_USER";
+
+  const passwordHash = checkIs.password; 
+  const isCorrect = await verified(password, passwordHash);
+
+  if (!isCorrect) return "PASSWORD_INCORRECT";
+
+  return passwordHash;
+}
+
+
+export { registerNewUser, loginUser, checkPasswordSvc };
