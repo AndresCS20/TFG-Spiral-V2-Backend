@@ -166,7 +166,9 @@ const getOnePublicationSvc = async (publicationId: string) => {
   try {
     const publication = await PublicationModel.findById(publicationId)
     .populate("author", "username fullname profile_picture profile_picture_frame")
-    .populate("comments.user", "username fullname profile_picture profile_picture_frame");
+    .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+    .populate("reactions.user", "username profile_picture profile_picture_frame")
+    .populate("community", "shortname fullname profile_picture");
     return publication;
   } catch (error) {
     throw new Error("Error al obtener la publicación");
