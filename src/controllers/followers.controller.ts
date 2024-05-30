@@ -1,6 +1,6 @@
 import { handleHttp } from "@utils/error.handle";
 import { Request, Response } from "express";
-import { insertFollowSvc, deleteFollowSvc, isFollowingUser } from "@services/follows.services";
+import { insertFollowSvc, deleteFollowSvc, isFollowingUserSvc } from "@services/follows.services";
 
 const followUser = async ({ body }: Request, res: Response) => {
     try {
@@ -8,7 +8,7 @@ const followUser = async ({ body }: Request, res: Response) => {
       const followId = body.followId;
   
       // Verificar si los usuarios ya se están siguiendo
-      const isFollowing: boolean = await isFollowingUser(userId, followId);
+      const isFollowing: boolean = await isFollowingUserSvc(userId, followId);
   
       if (isFollowing) {
         return res.status(400).json({
@@ -49,20 +49,30 @@ const followUser = async ({ body }: Request, res: Response) => {
         handleHttp(res, "ERROR_DELETE_FOLLOW", e);
     }
 }
-  
-// const unFollowUser = async ({ body }: Request, res: Response) => {
-  
-//     try {
-//         console.log(body);
-//         const userId = body.userId;
-//         const followId = body.followId;
-//         const response = await deleteFollowSvc(userId, followId);
-//         const data = response || "NOT_FOUND";
-//         res.status(200);
-//         res.send(data);
-//     } catch (e) {
-//         handleHttp(res, "ERROR_DELETE_FOLLOW", e);
-//     }
-// }
 
-export { followUser, unFollowUser}
+const isFollowing = async (req: Request, res: Response) => {
+    try {
+        const { userId, followId } = req.body;
+
+        const response = await isFollowingUserSvc(userId, followId);
+
+        if (!response) {
+            return res.status(200).json({
+                status: 'success',
+                result: false,
+                message: 'No se encontró el seguimiento'
+            });
+        }
+
+        return res.status(200).json({
+            status: 'success',
+            result: true,
+            message: 'Seguimiento encontrado',
+            body: response
+        });
+    } catch (e) {
+        handleHttp(res, "ERROR_CHECK_FOLLOW", e);
+    }
+}
+  
+export { followUser, unFollowUser, isFollowing}

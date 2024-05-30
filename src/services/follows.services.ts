@@ -2,14 +2,14 @@ import UserModel from "@models/user.model";
 import { User } from "@interfaces/user.interface";
 
 
-const isFollowingUser = async (userId: string, followId: string): Promise<boolean> => {
+const isFollowingUserSvc = async (userId: string, followId: string): Promise<boolean> => {
   try {
     // Buscar al usuario seguidor
     const user = await UserModel.findById(userId);
 
     // Verificar si el usuario seguido ya está en la lista de following del usuario seguidor
     const isFollowing = user ? user.following.some(follow => follow.user.toString() === followId) : false;
-
+    
     return isFollowing;
   } catch (error) {
     console.error(`Error al verificar el seguimiento: ${error}`);
@@ -70,5 +70,5 @@ const deleteFollowSvc = async (userId: string, followId: string): Promise<boolea
   }
 };
 
-export { insertFollowSvc, deleteFollowSvc, isFollowingUser};
+export { insertFollowSvc, deleteFollowSvc, isFollowingUserSvc};
 

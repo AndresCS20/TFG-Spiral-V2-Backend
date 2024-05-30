@@ -22,7 +22,7 @@ const authLogin = async ({ body }: Request, res: Response) => {
     default:
       const { user } = responseUser;
       res.status(200).send({
-        id: user._id,
+        _id: user._id,
         username: user.username,
         fullname: user.fullname,
         email: user.email,
