@@ -1,7 +1,9 @@
 import { addCommentToPublicationController, deleteCommentFromPublicationController } from "@controllers/comment.controller";
 import { createPublicationController, deletePublicationController, getAllPublicationsController, getFollowingPublicationsController, getNonFollowingPublicationsController, getOnePublicationController, getPublicationsOfUser, getUserCommunitiesPublications, updatePublicationController } from "@controllers/publication.controller";
 import { addReactionToPublicationController, deleteReactionFromPublicationController } from "@controllers/reaction.controller";
+import PublicationModel from "@models/publication.model";
 import { Router } from "express";
+const ObjectId = require('mongodb').ObjectId;
 
 const router = Router();
 
@@ -23,6 +25,7 @@ router
     // Endpoints para reacciones
     .post("/:publicationId/reactions", addReactionToPublicationController)
     .delete("/:publicationId/reactions/:reactionId", deleteReactionFromPublicationController)
-    
+
+
 
 export { router };

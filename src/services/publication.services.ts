@@ -45,7 +45,7 @@ const getUserCommunitiesPublicationsSvc = async (username: string) => {
     })
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
-      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
       .populate("community", "shortname fullname profile_picture");
     return publications;
   } catch (error) {
@@ -95,7 +95,7 @@ const getUserPublicationsSvc = async (username: string) => {
     })
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
-      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
       .populate("community", "shortname fullname profile_picture");
 
     return publications;
@@ -141,7 +141,7 @@ const getAllPublicationsSvc = async (communityId?: string) => {
       const allPublicationsCommunity = await PublicationModel.find({ community: idCommunity})
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
-      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
       .populate("community", "shortname fullname profile_picture")
 
       return allPublicationsCommunity;
@@ -150,7 +150,7 @@ const getAllPublicationsSvc = async (communityId?: string) => {
         {community: { $exists: false }})
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
-      .populate("reactions.user", "username profile_picture profile_picture_frame")
+      .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
 
       return allPublications;
       }
@@ -167,8 +167,8 @@ const getOnePublicationSvc = async (publicationId: string) => {
     const publication = await PublicationModel.findById(publicationId)
     .populate("author", "username fullname profile_picture profile_picture_frame")
     .populate("comments.user", "username fullname profile_picture profile_picture_frame")
-    .populate("reactions.user", "username profile_picture profile_picture_frame")
-    .populate("community", "shortname fullname profile_picture");
+    .populate("community", "shortname fullname profile_picture")
+    .populate("reactions.reactions.user", "username profile_picture profile_picture_frame");
     return publication;
   } catch (error) {
     throw new Error("Error al obtener la publicación");

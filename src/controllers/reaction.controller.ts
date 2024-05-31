@@ -1,25 +1,24 @@
 import { Request, Response } from "express";
 import { addReactionToPublication, deleteReactionFromPublication } from "@services/reaction.services";
 import { handleHttp } from "../utils/error.handle";
-import { Reaction, ReactionType } from "@interfaces/publication.interface";
+import { Reaction, ReactionType, UserReaction } from "@interfaces/publication.interface";
 
 // Agregar una reacción a una publicación
 const addReactionToPublicationController = async (req: Request, res: Response) => {
   try {
     const { publicationId } = req.params;
-    const { userId, type } = req.body;
+    const { userId, reactionType } = req.body;
 
-    if (!ReactionType.includes(type)) {
+    if (!ReactionType.includes(reactionType)) {
       throw new Error('Invalid reaction type');
     }
 
-    const reaction : Reaction= {
+    const reaction : UserReaction= {
       user: userId,
-      type: type,
       date: new Date(),
     };
 
-    const updatedPublication = await addReactionToPublication(publicationId, reaction);
+    const updatedPublication = await addReactionToPublication(publicationId, reactionType,reaction);
     return res.status(200).json({
       status: 'success',
       body: updatedPublication,
