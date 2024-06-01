@@ -28,11 +28,12 @@ const addReactionToPublicationController = async (req: Request, res: Response) =
   }
 };
 
-// Eliminar una reacción de una publicación
+// Eliminar una reacción de una publicación 
 const deleteReactionFromPublicationController = async (req: Request, res: Response) => {
   try {
     const { publicationId, reactionId } = req.params;
-    const updatedPublication = await deleteReactionFromPublication(publicationId, reactionId);
+    const { userId } = req.body;
+    const updatedPublication = await deleteReactionFromPublication(publicationId, reactionId,userId);
     return res.status(200).json({
       status: 'success',
       body: updatedPublication,

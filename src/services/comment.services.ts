@@ -9,7 +9,11 @@ const addCommentToPublication = async (publicationId: string, comment: Comment) 
       publicationId,
       { $push: { comments: comment } },
       { new: true }
-    ).populate("comments.user", "username");
+    )   
+    .populate("author", "username fullname profile_picture profile_picture_frame")
+    .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+    .populate("community", "shortname fullname profile_picture")
+    .populate("reactions.reactions.user", "username profile_picture profile_picture_frame");;
 
     return updatedPublication;
   } catch (error) {
