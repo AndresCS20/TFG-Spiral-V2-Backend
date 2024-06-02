@@ -5,16 +5,14 @@ import { Reaction, ReactionType, UserReaction } from "@interfaces/publication.in
 // Agregar una reacción a una publicación
 const addReactionToPublication = async (publicationId: string, reactionType:string ,reaction: UserReaction) => {
   try {
-    // const updatedPublication = await PublicationModel.findByIdAndUpdate(
-    //   publicationId,
-    //   { $push: { reactions: reaction } },
-    //   { new: true }
-    // );
     const updatedPublication = await PublicationModel.findOneAndUpdate(
       { _id: publicationId, 'reactions.type': reactionType },
       { $push: { 'reactions.$.reactions': reaction } },
       { new: true }
-    );
+    ) .populate("author", "username fullname profile_picture profile_picture_frame")
+      .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+      .populate("community", "shortname fullname profile_picture")
+      .populate("reactions.reactions.user", "username profile_picture profile_picture_frame");;;
     return updatedPublication;
   } catch (error) {
     throw new Error("Error al agregar reacción a la publicación");
@@ -50,7 +48,11 @@ const deleteReactionFromPublication = async (publicationId: string, reactionId: 
       { _id: publicationId, 'reactions._id': reactionId },
       { $pull: { 'reactions.$.reactions': { user: userId } } },
       { new: true }
-    );
+    )    
+    .populate("author", "username fullname profile_picture profile_picture_frame")
+    .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+    .populate("community", "shortname fullname profile_picture")
+    .populate("reactions.reactions.user", "username profile_picture profile_picture_frame");
     return updatedPublication;
   } catch (error) {
     throw new Error("Error al eliminar la reacción del usuario de la publicación");
