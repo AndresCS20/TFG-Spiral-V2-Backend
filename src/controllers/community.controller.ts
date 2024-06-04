@@ -58,6 +58,7 @@ const getCommunityMembers = async (req: Request, res: Response) => {
 const createCommunity = async (req: Request, res: Response) => {
     try {
         const community = req.body;
+        console.log(community);
         const response = await insertCommunitySvc(community);
         return res.status(200).json({
             status: 'success',

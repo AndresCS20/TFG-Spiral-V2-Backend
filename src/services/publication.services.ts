@@ -46,7 +46,8 @@ const getUserCommunitiesPublicationsSvc = async (username: string) => {
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
       .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
-      .populate("community", "shortname fullname profile_picture");
+      .populate("community", "shortname fullname profile_picture")
+      .sort({ createdAt: -1 });
     return publications;
   } catch (error) {
     console.error(error);
@@ -74,7 +75,8 @@ const getNonFollowingPublicationsSvc = async (username: string) => {
       author: { $nin: followingIds }, // Filtrar por autores que el usuario no sigue
       community: { $exists: false },
     })
-    .populate("author", "username fullname profile_picture profile_picture_frame");
+    .populate("author", "username fullname profile_picture profile_picture_frame").sort({ createdAt: -1 });;
+    
     
     return nonFollowingPublications;
   } catch (error) {
@@ -96,7 +98,8 @@ const getUserPublicationsSvc = async (username: string) => {
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
       .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
-      .populate("community", "shortname fullname profile_picture");
+      .populate("community", "shortname fullname profile_picture")
+      .sort({ createdAt: -1 });;
 
     return publications;
   } catch (error) {
@@ -123,7 +126,8 @@ const getFollowingPublicationsSvc = async (username: string) => {
       author: { $in: followingIds }, // Filtrar por autores que el usuario sigue
       community: { $exists: false },
     })
-    .populate("author", "username fullname profile_picture profile_picture_frame");
+    .populate("author", "username fullname profile_picture profile_picture_frame")
+    .sort({ createdAt: -1 });;
     
     return followingPublications;
   } catch (error) {
@@ -143,7 +147,8 @@ const getAllPublicationsSvc = async (communityId?: string) => {
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
       .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
       .populate("community", "shortname fullname profile_picture")
-
+      .sort({ createdAt: -1 });
+      
       return allPublicationsCommunity;
     } else{
       const allPublications = await PublicationModel.find(
@@ -151,7 +156,7 @@ const getAllPublicationsSvc = async (communityId?: string) => {
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
       .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
-
+      .sort({ createdAt: -1 });
       return allPublications;
       }
 

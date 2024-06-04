@@ -6,7 +6,11 @@ import { joinCommunityUserSvc, leaveCommunityUserSvc } from "./user.services";
 
 const insertCommunitySvc = async (community: Community) => {
   try {
+    const ownerId = community.owner;
     const responseInsert = await CommunityModel.create(community);
+    if(responseInsert._id){
+      addUserToCommunitySvc(community.shortname, ownerId.toString());
+    }
     return responseInsert;
   } catch (error) {
     console.error('Error inserting community:', error);
