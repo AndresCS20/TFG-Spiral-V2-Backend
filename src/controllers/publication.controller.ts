@@ -9,6 +9,7 @@ import {
   getUserPublicationsSvc,
   getNonFollowingPublicationsSvc,
   getUserCommunitiesPublicationsSvc,
+  getFollowingPublicationsPaginatedSvc,
 } from "@services/publication.services"
 import { handleHttp } from "../utils/error.handle";
 import { Publication } from "@interfaces/publication.interface";
@@ -42,7 +43,38 @@ const getNonFollowingPublicationsController = async (req: Request, res: Response
   }
 }
 
+const getFollowingPublicationsControllerPaginated = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const { page = '1', limit = '10' } = req.query; // Valores predeterminados para la paginación
+
+    const currentPage = parseInt(String(page), 10);
+    const pageSize = parseInt(String(limit), 10);
+
+    const { publications, totalPublications } = await getFollowingPublicationsPaginatedSvc(username, currentPage, pageSize);
+
+    const totalPages = Math.ceil(totalPublications / pageSize);
+
+    const paginationInfo = {
+      currentPage,
+      pageSize,
+      totalPages,
+      previousPage: currentPage > 1 ? currentPage - 1 : null,
+      nextPage: currentPage < totalPages ? currentPage + 1 : null
+    };
+
+    return res.status(200).json({
+      status: 'success',
+      body: publications,
+      pagination: paginationInfo
+    });
+  } catch (error) {
+    handleHttp(res, "ERROR_GET_FOLLOWING_PUBLICATIONS", error);
+  }
+};
+
 // Obtener todas las publicaciones de los usuarios seguidos
+// * Controlador sin paginacion
 const getFollowingPublicationsController = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
@@ -177,6 +209,7 @@ export {
   getPublicationsOfUser,
   getNonFollowingPublicationsController,
   getFollowingPublicationsController,
+  getFollowingPublicationsControllerPaginated,
   getAllPublicationsController,
   getOnePublicationController,
   createPublicationController,

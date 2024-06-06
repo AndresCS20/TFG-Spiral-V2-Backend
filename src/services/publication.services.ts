@@ -108,9 +108,41 @@ const getUserPublicationsSvc = async (username: string) => {
   }
 };
 
+const getFollowingPublicationsPaginatedSvc = async (username: string, page: number, limit: number) => {
+  try {
+    // Obtener la lista de usuarios seguidos
+    const followingList = await getFollowingOfUserSvc(username);
+
+    // Extraer solo los IDs de los usuarios seguidos
+    const followingIds = followingList.map(following => following.user._id);
+
+    // Calcular el desplazamiento (offset) para la paginación
+    const skip = (page - 1) * limit;
+
+    // Buscar las publicaciones de los usuarios seguidos y contar el total
+    const [publications, totalPublications] = await Promise.all([
+      PublicationModel.find({
+        author: { $in: followingIds }, // Filtrar por autores que el usuario sigue
+        community: { $exists: false },
+      })
+        .populate("author", "username fullname profile_picture profile_picture_frame")
+        .sort({ createdAt: -1 })
+        .skip(skip) // Aplicar el desplazamiento
+        .limit(limit), // Limitar el número de resultados
+      PublicationModel.countDocuments({
+        author: { $in: followingIds },
+        community: { $exists: false },
+      })
+    ]);
+
+    return { publications, totalPublications };
+  } catch (error) {
+    throw new Error(`Error al obtener las publicaciones de los usuarios seguidos: ${error}`);
+  }
+};
 
 //Obtener todas las publicaciones de los usuarios seguidos
-
+// * Servicio sin paginacion
 const getFollowingPublicationsSvc = async (username: string) => {
   try {
     // Obtener la lista de usuarios seguidos
@@ -215,6 +247,7 @@ export {
   getUserPublicationsSvc,
   getNonFollowingPublicationsSvc,
   getFollowingPublicationsSvc,
+  getFollowingPublicationsPaginatedSvc,
   getAllPublicationsSvc,
   getOnePublicationSvc,
   createPublicationSvc,
