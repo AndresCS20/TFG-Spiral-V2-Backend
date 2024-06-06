@@ -10,6 +10,7 @@ import {
   getNonFollowingPublicationsSvc,
   getUserCommunitiesPublicationsSvc,
   getFollowingPublicationsPaginatedSvc,
+  getAllPublicationsPaginatedSvc,
 } from "@services/publication.services"
 import { handleHttp } from "../utils/error.handle";
 import { Publication } from "@interfaces/publication.interface";
@@ -19,10 +20,27 @@ import { getCommunitySvc } from "@services/community.services";
 const getUserCommunitiesPublications = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const publications = await getUserCommunitiesPublicationsSvc(username);
+    const { page = '1', limit = '10' } = req.query; // Valores predeterminados para la paginación
+
+    const currentPage = parseInt(String(page), 10);
+    const pageSize = parseInt(String(limit), 10);
+
+    const {publications, totalPublications} = await getUserCommunitiesPublicationsSvc(username, currentPage, pageSize);
+    
+    const totalPages = Math.ceil(totalPublications / pageSize);
+
+    const paginationInfo = {
+      currentPage,
+      pageSize,
+      totalPages,
+      previousPage: currentPage > 1 ? currentPage - 1 : null,
+      nextPage: currentPage < totalPages ? currentPage + 1 : null
+    };
+
     return res.status(200).json({
       status: 'success',
       body: publications,
+      pagination: paginationInfo
     }); 
   } catch (error) {
     handleHttp(res, "ERROR_GET_USER_COMMUNITIES_PUBLICATIONS", error);
@@ -33,15 +51,53 @@ const getUserCommunitiesPublications = async (req: Request, res: Response) => {
 const getNonFollowingPublicationsController = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const nonFollowingPublications = await getNonFollowingPublicationsSvc(username);
-    return res.status(200).json({
+    const { page = 1, limit = 10 } = req.query;
+
+    const currentPage = parseInt(String(page), 10);
+    const pageSize = parseInt(String(limit), 10);
+
+    const result = await getNonFollowingPublicationsSvc(username, currentPage, pageSize);
+    if (!result) {
+      return res.status(500).json({
+        status: 'error',
+        error: 'Error al obtener las publicaciones no seguidas',
+      });
+    }
+
+    const { nonFollowingPublications, totalPublications } = result;
+    const totalPages = Math.ceil(totalPublications / pageSize);
+
+    const paginationInfo = {
+      currentPage,
+      pageSize,
+      totalPages,
+      previousPage: currentPage > 1 ? currentPage - 1 : null,
+      nextPage: currentPage < totalPages ? currentPage + 1 : null
+    };
+
+  return res.status(200).json({
       status: 'success',
       body: nonFollowingPublications,
-    }); 
+      pagination: paginationInfo
+    });
   } catch (error) {
     handleHttp(res, "ERROR_GET_NON_FOLLOWING_PUBLICATIONS", error);
   }
-}
+};
+
+// const getNonFollowingPublicationsController = async (req: Request, res: Response) => {
+//   try {
+//     const { username } = req.params;
+//     const nonFollowingPublications = await getNonFollowingPublicationsSvc(username);
+    
+//     return res.status(200).json({
+//       status: 'success',
+//       body: nonFollowingPublications,
+//     }); 
+//   } catch (error) {
+//     handleHttp(res, "ERROR_GET_NON_FOLLOWING_PUBLICATIONS", error);
+//   }
+// }
 
 const getFollowingPublicationsControllerPaginated = async (req: Request, res: Response) => {
   try {
@@ -88,10 +144,55 @@ const getFollowingPublicationsController = async (req: Request, res: Response) =
   }
 };
 
+const getAllPublicationsPaginatedController = async (req: Request, res: Response) => {
+  try {
+    const { communityShortname } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const currentPage = parseInt(String(page), 10);
+    const pageSize = parseInt(String(limit), 10);
+
+    let communityId: string | undefined = undefined;
+    if (communityShortname) {
+      const community = await getCommunitySvc(communityShortname);
+      if (!community) {
+        return res.status(404).json({
+          status: 'error',
+          error: 'Comunidad no encontrada',
+        });
+      }
+      communityId = community._id as string;
+      console.log(communityId);
+    }
+    console.log(communityId);
+
+    const { publications, totalPublications } = await getAllPublicationsPaginatedSvc(Number(page), Number(limit), communityId);
+    const totalPages = Math.ceil(totalPublications / Number(limit));
+
+    const paginationInfo = {
+      currentPage,
+      pageSize,
+      totalPages,
+      previousPage: currentPage > 1 ? currentPage - 1 : null,
+      nextPage: currentPage < totalPages ? currentPage + 1 : null
+    };
+
+    return res.status(200).json({
+      status: 'success',
+      body: publications,
+      pagination: paginationInfo
+    });   
+  } catch (error) {
+    handleHttp(res, "ERROR_GET_ALL_PUBLICATIONS", error);
+  }
+};
+
+
 // Obtener todas las publicaciones
 const getAllPublicationsController = async (req: Request, res: Response) => {
   try {
     const { communityShortname } = req.params;
+    
     let communityId: string | undefined = undefined;
     if (communityShortname) {
       const community = await getCommunitySvc(communityShortname);
@@ -118,10 +219,25 @@ const getAllPublicationsController = async (req: Request, res: Response) => {
 const getPublicationsOfUser = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
-    const publications = await getUserPublicationsSvc(username);
+    const { page = '1', limit = '10' } = req.query; // Valores predeterminados para la paginación
+
+    const currentPage = parseInt(String(page), 10);
+    const pageSize = parseInt(String(limit), 10);
+
+    const {publications, totalPublications} = await getUserPublicationsSvc(username, currentPage, pageSize);
+    
+    const totalPages = Math.ceil(totalPublications / pageSize);
+    const paginationInfo = {
+      currentPage,
+      pageSize,
+      totalPages,
+      previousPage: currentPage > 1 ? currentPage - 1 : null,
+      nextPage: currentPage < totalPages ? currentPage + 1 : null
+    };
     return res.status(200).json({
       status: 'success',
       body: publications,
+      pagination: paginationInfo
     }); 
   } catch (error) {
     handleHttp(res, "ERROR_GET_USER_PUBLICATIONS", error);
@@ -211,6 +327,7 @@ export {
   getFollowingPublicationsController,
   getFollowingPublicationsControllerPaginated,
   getAllPublicationsController,
+  getAllPublicationsPaginatedController,
   getOnePublicationController,
   createPublicationController,
   updatePublicationController,

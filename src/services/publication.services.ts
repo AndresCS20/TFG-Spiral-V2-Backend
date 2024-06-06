@@ -32,66 +32,111 @@ const getAllPublicationImagesSvc = async (username: string) => {
 
 //////////////////////////////////////////////////////////////////////////
 
-const getUserCommunitiesPublicationsSvc = async (username: string) => {
+const getUserCommunitiesPublicationsSvc = async (username: string, page: number, limit: number) => {
   try {
     const user = await UserModel.findOne({ username });
     if(!user) throw new Error("Usuario no encontrado");
     const communities = user.communities;
 
+    // Calcular el desplazamiento (offset) para la paginación
+    const skip = (page - 1) * limit;
+
     const communitiesIds= communities.map(community => community.community);
     console.log(communitiesIds);
-    const publications = await PublicationModel.find({
+    const [publications, totalPublications] = await Promise.all([
+    PublicationModel.find({
       community: { $in: communitiesIds },
     })
       .populate("author", "username fullname profile_picture profile_picture_frame")
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
       .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
       .populate("community", "shortname fullname profile_picture")
-      .sort({ createdAt: -1 });
-    return publications;
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+      PublicationModel.countDocuments({ community: { $in: communitiesIds } }),
+    ]);
+    return {publications, totalPublications};
   } catch (error) {
     console.error(error);
     throw new Error("Error al obtener las publicaciones de las comunidades del usuario");
   }
 };
 
-const getNonFollowingPublicationsSvc = async (username: string) => {
+const getNonFollowingPublicationsSvc = async (username: string, page: number, limit: number) => {
   try {
-
     const user = await UserModel.findOne({ username });
-    if(!user) throw new Error("Usuario no encontrado");
+    if (!user) throw new Error("Usuario no encontrado");
     const userId = new Types.ObjectId(user._id);
-    // Obtener la lista de usuarios seguidos
-    const followingList = await getFollowingOfUserSvc(username);
-    console.log(followingList);
 
-    // Extraer solo los IDs de los usuarios seguidos
+    const followingList = await getFollowingOfUserSvc(username);
     const followingIds = followingList.map(following => following.user._id);
     followingIds.push(userId);
-    console.log(followingIds);
 
-    // Buscar las publicaciones de los usuarios que no se siguen
-    const nonFollowingPublications = await PublicationModel.find({
-      author: { $nin: followingIds }, // Filtrar por autores que el usuario no sigue
-      community: { $exists: false },
-    })
-    .populate("author", "username fullname profile_picture profile_picture_frame").sort({ createdAt: -1 });;
-    
-    
-    return nonFollowingPublications;
+    const skip = (page - 1) * limit;
+
+    const [nonFollowingPublications, totalPublications] = await Promise.all([
+      PublicationModel.find({
+        author: { $nin: followingIds },
+        community: { $exists: false },
+      })
+      .populate("author", "username fullname profile_picture profile_picture_frame")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+      PublicationModel.countDocuments({
+        author: { $nin: followingIds },
+        community: { $exists: false },
+      }),
+    ]);
+
+    return { nonFollowingPublications, totalPublications };
   } catch (error) {
     console.error(error);
+    return { nonFollowingPublications: [], totalPublications: 0 }; // Maneja el caso de error
   }
 };
-const getUserPublicationsSvc = async (username: string) => {
+
+// const getNonFollowingPublicationsSvc = async (username: string) => {
+//   try {
+
+//     const user = await UserModel.findOne({ username });
+//     if(!user) throw new Error("Usuario no encontrado");
+//     const userId = new Types.ObjectId(user._id);
+//     // Obtener la lista de usuarios seguidos
+//     const followingList = await getFollowingOfUserSvc(username);
+//     console.log(followingList);
+
+//     // Extraer solo los IDs de los usuarios seguidos
+//     const followingIds = followingList.map(following => following.user._id);
+//     followingIds.push(userId);
+//     console.log(followingIds);
+
+//     // Buscar las publicaciones de los usuarios que no se siguen
+//     const nonFollowingPublications = await PublicationModel.find({
+//       author: { $nin: followingIds }, // Filtrar por autores que el usuario no sigue
+//       community: { $exists: false },
+//     })
+//     .populate("author", "username fullname profile_picture profile_picture_frame").sort({ createdAt: -1 });;
+    
+    
+//     return nonFollowingPublications;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+const getUserPublicationsSvc = async (username: string, page: number, limit: number) => {
   try {
 
     const user = await UserModel.findOne({ username });
     const userId = user?._id;
 
+    const skip = (page - 1) * limit;
+
     if(!userId) throw new Error("Usuario no encontrado");
 
-    const publications = await PublicationModel.find({
+    const [publications, totalPublications] = await Promise.all([
+    PublicationModel.find({
       author: userId,
       // community: { $exists: false }
     })
@@ -99,9 +144,13 @@ const getUserPublicationsSvc = async (username: string) => {
       .populate("comments.user", "username fullname profile_picture profile_picture_frame")
       .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
       .populate("community", "shortname fullname profile_picture")
-      .sort({ createdAt: -1 });;
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+      PublicationModel.countDocuments({ author: userId }),
+    ])
 
-    return publications;
+    return {publications, totalPublications};
   } catch (error) {
     console.error(error);
     throw new Error("Error al obtener las publicaciones del usuario");
@@ -166,6 +215,41 @@ const getFollowingPublicationsSvc = async (username: string) => {
     throw new Error(`Error al obtener las publicaciones de los usuarios seguidos: ${error}`);
   }
 };
+
+
+const getAllPublicationsPaginatedSvc = async (page: number, limit: number, communityId?: string) => {
+  try {
+    const skip = (page - 1) * limit;
+
+    let query: any = {};
+    if (communityId) {
+      const idCommunity = new Types.ObjectId(communityId);
+      query = { community: idCommunity };
+    } else {
+      query = { community: { $exists: false } };
+    }
+
+    // Buscar las publicaciones y contar el total
+    const [publications, totalPublications] = await Promise.all([
+      PublicationModel.find(query)
+        .populate("author", "username fullname profile_picture profile_picture_frame")
+        .populate("comments.user", "username fullname profile_picture profile_picture_frame")
+        .populate("reactions.reactions.user", "username profile_picture profile_picture_frame")
+        .populate("community", "shortname fullname profile_picture")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      PublicationModel.countDocuments(query)
+    ]);
+
+
+    return { publications, totalPublications };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al obtener todas las publicaciones");
+  }
+};
+
 
 // Obtener todas las publicaciones 
 const getAllPublicationsSvc = async (communityId?: string) => {
@@ -249,6 +333,7 @@ export {
   getFollowingPublicationsSvc,
   getFollowingPublicationsPaginatedSvc,
   getAllPublicationsSvc,
+  getAllPublicationsPaginatedSvc,
   getOnePublicationSvc,
   createPublicationSvc,
   updatePublicationSvc,
