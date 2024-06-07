@@ -159,12 +159,19 @@ const getUserPublicationsSvc = async (username: string, page: number, limit: num
 
 const getFollowingPublicationsPaginatedSvc = async (username: string, page: number, limit: number) => {
   try {
+    const user = await UserModel.findOne({ username });
+    let userId !: Types.ObjectId;
+    if(user){
+      userId = new Types.ObjectId(user._id);
+    }
     // Obtener la lista de usuarios seguidos
     const followingList = await getFollowingOfUserSvc(username);
-
+    
     // Extraer solo los IDs de los usuarios seguidos
     const followingIds = followingList.map(following => following.user._id);
-
+    if(userId){
+      followingIds.push(userId);
+    }
     // Calcular el desplazamiento (offset) para la paginación
     const skip = (page - 1) * limit;
 
