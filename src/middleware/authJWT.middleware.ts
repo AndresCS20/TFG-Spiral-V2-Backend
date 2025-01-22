@@ -28,32 +28,32 @@ const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextF
   }
 };
 
-const checkUserRole = (role: string) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const user = await UserModel.findById(req.userId).exec();
+// const checkUserRole = (role: string) => {
+//   return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+//     try {
+//       const user = await UserModel.findById(req.userId).exec();
 
-      if (!user) {
-        return res.status(404).send({ message: 'User not found!' });
-      }
+//       if (!user) {
+//         return res.status(404).send({ message: 'User not found!' });
+//       }
 
-      const roles = await RoleModel.find({ _id: { $in: user.roles } }).exec();
+//       const roles = await RoleModel.find({ _id: { $in: user.roles } }).exec();
 
-      const roleNames = roles.map((role : Role) => role.name);
+//       const roleNames = roles.map((role : Role) => role.name);
 
-      if (roleNames.includes(role)) {
-        next();
-      } else {
-        return res.status(403).send({ message: `Require ${role} Role!` });
-      }
-    } catch (error: any) {
-      return res.status(500).send({ message: error.message });
-    }
-  };
-};
+//       if (roleNames.includes(role)) {
+//         next();
+//       } else {
+//         return res.status(403).send({ message: `Require ${role} Role!` });
+//       }
+//     } catch (error: any) {
+//       return res.status(500).send({ message: error.message });
+//     }
+//   };
+// };
 
-export const isAdmin = checkUserRole('admin');
-export const isModerator = checkUserRole('moderator');
+// export const isAdmin = checkUserRole('admin');
+// export const isModerator = checkUserRole('moderator');
 
 export default verifyToken;
 

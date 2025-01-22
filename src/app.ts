@@ -4,6 +4,7 @@ import cors from 'cors';
 import { router } from './routes/index.routes';
 import dbConnect from "./config/mongo";
 import { Error } from "mongoose";
+require('module-alias/register');
 
 const morgan = require('morgan');
 const app = express();
